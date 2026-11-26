@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Limits of this map</title>
+<title>Limits of this map: Lake Victoria regional research preview</title>
 <link rel="stylesheet" href="style.css">
 <style>
   body { overflow: auto; }
@@ -14,19 +14,19 @@
 </head>
 <body>
 <header class="bar">
-  <div class="title"><strong>Worldwide Quality of Life Map</strong><span class="sub">Limits of this map (commitment C-13)</span></div>
+  <div class="title"><strong>Worldwide Quality of Life Map</strong><span class="sub">Lake Victoria regional research preview · Limits of this map (commitment C-13)</span></div>
   <nav><a href="index.html">Back to the map</a></nav>
 </header>
 <article>
 <h1>What this map can and cannot tell you</h1>
-<p>This is a proof of concept for one window around Lake Victoria (2°S to 3°N, 30°E to 36°E), built in WQL-002. It shows a few openly licensed observations on a common hexagonal grid. It is not a measure of quality of life, and it does not say where life is better or worse.</p>
+<p>This is the Lake Victoria regional research preview: one window around Lake Victoria (2°S to 3°N, 30°E to 36°E), built in WQL-002. It shows a few openly licensed observations on a common hexagonal grid. It is not a measure of quality of life, and it does not say where life is better or worse.</p>
 
 <h2>What it is not</h2>
 <ul>
   <li><strong>Not a score or a ranking.</strong> Every layer is shown on its own. Nothing is added up, weighted or ranked, and colours are classes of the values in this window only.</li>
   <li><strong>Not a measurement at 36 km².</strong> The H3 resolution-6 hexagon is a common index for joining sources. Each value says what grid or points it came from and how many fell in the cell.</li>
-  <li><strong>Not a count of people.</strong> Both population layers are models that spread census totals over mapped buildings. They disagree with each other, and the disagreement layer shows by how much.</li>
-  <li><strong>Not a record of all violence.</strong> UCDP records reported organised violence with deaths. A cell with zero means nothing was recorded there, which is not the same as nothing happening. Reporting is thinnest where access is hardest.</li>
+  <li><strong>Not a count of people.</strong> Both population layers are models that spread census totals over mapped buildings. They disagree with each other, and two layers show by how much: the relative difference (% of their mean) and the absolute difference (people). Read them together.</li>
+  <li><strong>No conflict data in this preview.</strong> Cell-level conflict records are withheld. At H3 resolution 6, 83 cells would show a single recorded event with its fatality estimate and range, which does not clear commitment C-11 (do no harm). A coarser conflict release will be reviewed separately.</li>
   <li><strong>Not a statement about facilities.</strong> Travel time to the nearest health facility says nothing about whether that facility has staff, medicine or fees people can pay.</li>
   <li><strong>Not a boundary authority.</strong> Country outlines come from geoBoundaries and are drawn for orientation. Where two outlines overlap the map says so. The short list of contested places is not drawn from a neutral register and is incomplete.</li>
 </ul>
@@ -35,8 +35,8 @@
 <ul>
   <li>Eastern DRC has had no census since at least 1984, so every population figure there rests on a far older anchor than its neighbours'. The census-age layer shows this directly.</li>
   <li>Some Lake Victoria islands and shoreline settlements fall outside the simplified country outlines, so they have no country-level values even though people live there.</li>
-  <li>Three of the eight core v0.1 layers are not here yet: night-light radiance (needs a login to the source), PM2.5 (download host not yet allowed in the build environment) and a full evidence-grading rule set.</li>
-  <li>Population figures are for 2020, travel time for 2019 to 2020, conflict for 2021 to 2025, and census dates as of 2026. They are not one moment in time.</li>
+  <li>Three of the eight core v0.1 layers are not here: night-light radiance (needs a login to the source), PM2.5 (download host not yet allowed in the build environment) and conflict deaths (withheld, above). The evidence-grading rules are still simplified.</li>
+  <li>Population figures are for 2020, travel time for 2019 to 2020, and census dates as of 2026. They are not one moment in time.</li>
 </ul>
 
 <h2>How to read the evidence flag</h2>
@@ -48,8 +48,14 @@
 <h2>Corrections</h2>
 <p>If something here is wrong about a place you know, please open an issue at <a href="https://github.com/nomenolly/worldwide-quality-of-life/issues">github.com/nomenolly/worldwide-quality-of-life/issues</a>. A fuller channel for affected people to challenge observations (C-14) is planned but not built.</p>
 
-<h2>Sources and licences</h2>
-<p>GHS-POP and GHS-SMOD R2023A (European Commission JRC, CC BY 4.0); WorldPop Global2 R2025A (CC BY 4.0, partly verified); Malaria Atlas Project travel time to healthcare 2020 (CC BY 3.0); UCDP GED 26.1 (CC BY 4.0); UNSD census dates; geoBoundaries ADM0 (licence per country: Uganda and DRC ODbL 1.0, Tanzania and Rwanda CC BY 4.0, Kenya and Burundi public domain); basemap © OpenStreetMap contributors. Full citations are in each cell's "Caveat and source" panel and in the repository.</p>
+<h2 id="downloads">Downloads and licences</h2>
+<p>Everything the map shows can be downloaded. The files fall into two groups with different terms.</p>
+<table class="grades" style="font-size:13px">
+<tr><td><strong>Observations</strong></td><td><a href="data/observations.json">observations.json</a> · <a href="data/indicators.json">indicators.json</a> · <a href="data/cells.geojson">cells.geojson</a> · CSV in the <a href="https://github.com/nomenolly/worldwide-quality-of-life/tree/main/data/processed">repository</a></td><td>Each value under its source's terms (below)</td></tr>
+<tr><td><strong>Boundary-derived data</strong></td><td><a href="data/boundary-derived/boundaries.geojson">boundaries.geojson</a> · <a href="data/boundary-derived/cell-countries.csv">cell-countries.csv</a> · <a href="data/boundary-derived/cell-countries.json">cell-countries.json</a> · <a href="data/boundary-derived/datapackage.json">datapackage.json</a> · <a href="data/boundary-derived/LICENSE.md">LICENSE.md</a></td><td><a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL 1.0</a>, share-alike</td></tr>
+</table>
+<p><strong>Boundary-derived data (ODbL 1.0).</strong> The country outlines, each cell's country coverage, the boundary-overlap and dispute flags, years since census per cell, and the population recency grade that depends on it all derive from geoBoundaries outlines. The Uganda and DRC outlines are under ODbL 1.0, so this whole package is offered under ODbL 1.0. If you publicly use an adapted version, you must offer it under ODbL too, and keep it free of technical restrictions. Attribution: <em>Contains boundary-derived data from the Worldwide Quality of Life Map, made available under the Open Database License 1.0. Country outlines from geoBoundaries (Runfola et al. 2020); Uganda and DRC outlines © OpenStreetMap contributors (via Wambacher), ODbL 1.0.</em> Tanzania and Rwanda outlines are CC BY 4.0; Kenya and Burundi are public domain.</p>
+<p><strong>Observation sources.</strong> GHS-POP and GHS-SMOD R2023A: European Commission, Joint Research Centre; reuse authorised provided the source is acknowledged (Commission Decision 2011/833/EU), licensed CC BY 4.0 (<a href="https://data.jrc.ec.europa.eu/dataset/2ff68a52-5b5b-4a22-8f40-c41da8332cfe">JRC dataset record</a>). WorldPop Global2 R2025A: CC BY 4.0, confirmed by WorldPop (<a href="https://www.worldpop.org/faq/">FAQ</a>); WorldPop asks that its data not be used to discriminate, exploit or surveil. Malaria Atlas Project travel time to healthcare 2020: CC BY 3.0. UNSD census dates: transcribed from the UN Statistics Division page. Basemap tiles © OpenStreetMap contributors. Full citations are in each cell's "Caveat and source" panel and in the repository.</p>
 </article>
 </body>
 </html>

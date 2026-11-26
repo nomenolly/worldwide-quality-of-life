@@ -66,7 +66,7 @@
     },
     {
       "id": "pop.disagreement",
-      "label": "Population disagreement (WorldPop vs GHSL)",
+      "label": "Population disagreement, relative (WorldPop vs GHSL)",
       "domain": "Knowledge: data quality",
       "unit": "% of mean",
       "source_id": "worldpop_2020",
@@ -79,7 +79,8 @@
       "lineage": [
         "Take pop.ghsl and pop.worldpop for the cell",
         "Skip cells where both are below 100 people",
-        "Compute (WorldPop - GHSL) / mean(WorldPop, GHSL) x 100"
+        "Relative difference = (WorldPop - GHSL) / mean(WorldPop, GHSL) x 100",
+        "Absolute difference = WorldPop - GHSL, in people"
       ],
       "grade_detail": {
         "recency": "B",
@@ -90,13 +91,62 @@
         "interval": "D"
       },
       "grade": "D",
-      "caveat": "A measure of how far two reputable models disagree, not of which is right. Positive means WorldPop places more people here than GHSL.",
+      "caveat": "A measure of how far two reputable models disagree, not of which is right. Two measures are shown together: the relative difference (mapped, % of the mean of the two) and the absolute difference in people (in the inspector and downloads). Positive means WorldPop places more people here than GHSL.",
       "scale": {
         "type": "diverging",
         "palette": "div",
-        "domain": [
+        "breaks": [
+          -100,
+          -50,
+          -20,
+          0,
+          20,
+          50,
+          100
+        ]
+      },
+      "sources": [
+        "ghsl_pop_2020",
+        "worldpop_2020"
+      ]
+    },
+    {
+      "id": "pop.disagreement_abs",
+      "label": "Population disagreement, absolute (WorldPop minus GHSL)",
+      "domain": "Knowledge: data quality",
+      "unit": "people",
+      "source_id": "worldpop_2020",
+      "period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84",
+      "status": "derived",
+      "lineage": [
+        "Take pop.ghsl and pop.worldpop for the cell",
+        "Absolute difference = WorldPop - GHSL, in people"
+      ],
+      "grade_detail": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "B",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade": "D",
+      "caveat": "The companion to the relative disagreement layer. Large absolute gaps sit in dense places even when the relative gap is small; large relative gaps can sit in places with few people. Read the two together. Positive means WorldPop places more people here than GHSL.",
+      "scale": {
+        "type": "diverging",
+        "palette": "div",
+        "breaks": [
+          -5000,
+          -1000,
           -200,
-          200
+          0,
+          200,
+          1000,
+          5000
         ]
       },
       "sources": [
@@ -208,41 +258,6 @@
       }
     },
     {
-      "id": "sec.conflict",
-      "label": "Deaths in organised violence, 2021-2025 (UCDP GED)",
-      "domain": "Physical security",
-      "unit": "deaths (5-year total)",
-      "source_id": "ucdp_ged_261",
-      "period": [
-        "2021-01-01",
-        "2025-12-31"
-      ],
-      "native_grain": "Event points with a location precision code (1 exact, 2 within 25 km, 3 ADM2, 4 ADM1, 5 linear or fuzzy feature, 6 country, 7 international waters)",
-      "status": "measured",
-      "lineage": [
-        "Keep events dated 2021-2025 with coordinates inside the window",
-        "Keep events located exactly (precision 1) or within 25 km of a known point (precision 2)",
-        "Assign each event to the H3 res-6 cell containing its coded point",
-        "Sum best, low and high death estimates per cell over the five years",
-        "Events located only to an administrative area or coarser are counted per country, not placed"
-      ],
-      "grade_detail": {
-        "recency": "A",
-        "directness": "B",
-        "spatial_fidelity": "B",
-        "coverage": "C",
-        "validation": "B",
-        "interval": "B"
-      },
-      "grade": "C",
-      "caveat": "Recorded deaths in state-based, non-state and one-sided violence with at least 25 deaths per year in the conflict or dyad. A zero means no recorded event, not no violence. Precision-2 events may have happened up to 25 km away, i.e. in a neighbouring cell. Only five-year cell totals are published; no event-level detail is shown.",
-      "scale": {
-        "type": "log",
-        "palette": "seq"
-      },
-      "interval_meaning": "UCDP low and high death estimates, summed"
-    },
-    {
       "id": "kno.census_age",
       "label": "Years since the last population census",
       "domain": "Knowledge: data quality",
@@ -277,7 +292,9 @@
           0,
           45
         ]
-      }
+      },
+      "package": "boundary-derived",
+      "licence_note": "Per-cell values derive from geoBoundaries outlines, so they are published in the ODbL boundary-derived package."
     }
   ],
   "sources": {
@@ -286,8 +303,9 @@
       "publisher": "European Commission, Joint Research Centre (GHSL)",
       "url": "https://human-settlement.emergency.copernicus.eu/download.php?ds=pop",
       "download": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_4326_30ss/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0_{tile}.zip",
-      "licence": "CC BY 4.0",
-      "licence_checked": "2026-11-26, copyright.txt in the download folder",
+      "licence": "Reuse authorised provided the source is acknowledged (Commission Decision 2011/833/EU on the reuse of Commission documents); licensed under CC BY 4.0",
+      "licence_url": "https://data.jrc.ec.europa.eu/dataset/2ff68a52-5b5b-4a22-8f40-c41da8332cfe",
+      "licence_checked": "2026-11-26: JRC dataset record (release review) and copyright.txt in the download folder",
       "citation": "Schiavina M., Freire S., Carioli A., MacManus K. (2023): GHS-POP R2023A - GHS population grid multitemporal (1975-2030). European Commission, Joint Research Centre. doi:10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE",
       "native_grain": "30 arc-second raster (about 0.93 km at the equator), WGS84; JRC's own resampling of the 100 m / 1 km Mollweide product",
       "reference_period": [
@@ -311,8 +329,9 @@
       "publisher": "WorldPop, University of Southampton",
       "url": "https://hub.worldpop.org/project/categories?id=3",
       "download": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/0_Mosaicked/v1/1km_ua/constrained/global_pop_2020_CN_1km_R2025A_UA_v1.tif",
-      "licence": "CC BY 4.0 (stated by the Google Earth Engine catalogue; WorldPop's own pages state none)",
-      "licence_checked": "2026-11-26, partly verified: confirm with WorldPop before redistributing derived rasters",
+      "licence": "CC BY 4.0 (confirmed by WorldPop for Global2 R2025A)",
+      "licence_url": "https://www.worldpop.org/faq/",
+      "licence_checked": "2026-11-26: WorldPop catalogue (https://api.worldpop.org/v3/documentation) and redistribution FAQ, per the release review",
       "citation": "WorldPop (www.worldpop.org). Global2 R2025A population estimates, 2020, 1 km, constrained, UN-adjusted. University of Southampton. Labelled alpha by the publisher.",
       "native_grain": "30 arc-second raster (about 0.93 km), WGS84",
       "reference_period": [
@@ -336,7 +355,7 @@
       "publisher": "European Commission, Joint Research Centre (GHSL)",
       "url": "https://human-settlement.emergency.copernicus.eu/download.php?ds=smod",
       "download": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_SMOD_GLOBE_R2023A/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss/V2-0/tiles/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss_V2_0_{tile}.zip",
-      "licence": "CC BY 4.0",
+      "licence": "Reuse authorised provided the source is acknowledged (Commission Decision 2011/833/EU); licensed under CC BY 4.0",
       "licence_checked": "2026-11-26, copyright.txt in the download folder",
       "citation": "Schiavina M., Melchiorri M., Pesaresi M. (2023): GHS-SMOD R2023A - GHS settlement layers, application of the Degree of Urbanisation methodology (stage I) to GHS-POP R2023A and GHS-BUILT-S R2023A, multitemporal (1975-2030). European Commission, Joint Research Centre. doi:10.2905/A0DF7A6F-49DE-46EA-9BDE-563437A6E2BA",
       "native_grain": "30 arc-second raster (about 0.93 km), WGS84; JRC's resampling of the native 1 km Mollweide grid",
@@ -381,31 +400,6 @@
       "grade_notes": "A least-cost model over a friction surface and a facility list. Facility coverage in the source list varies by country and is not quantified here. Travel time to the nearest facility says nothing about the facility's quality, staffing or cost.",
       "grade_weakest": "D"
     },
-    "ucdp_ged_261": {
-      "name": "UCDP Georeferenced Event Dataset (GED) Global version 26.1",
-      "publisher": "Uppsala Conflict Data Program, Uppsala University",
-      "url": "https://ucdp.uu.se/downloads/",
-      "download": "https://ucdp.uu.se/downloads/ged/ged261-csv.zip",
-      "licence": "CC BY 4.0",
-      "licence_checked": "2026-11-26, per WQL-001 section 4.6",
-      "citation": "Sundberg, Ralph, and Erik Melander, 2013, 'Introducing the UCDP Georeferenced Event Dataset', Journal of Peace Research 50(4): 523-532. Högbladh, Stina, 2026, 'UCDP GED Codebook version 26.1', Department of Peace and Conflict Research, Uppsala University.",
-      "native_grain": "Event points with a location precision code (1 exact, 2 within 25 km, 3 ADM2, 4 ADM1, 5 linear or fuzzy feature, 6 country, 7 international waters)",
-      "reference_period": [
-        "2021-01-01",
-        "2025-12-31"
-      ],
-      "status": "measured",
-      "grade": {
-        "recency": "A",
-        "directness": "B",
-        "spatial_fidelity": "B",
-        "coverage": "C",
-        "validation": "B",
-        "interval": "B"
-      },
-      "grade_notes": "Event-coded from news and NGO reporting, so it records reported organised violence with at least one death, not all violence. Coverage is weakest where reporting is weakest. Deaths carry low, best and high estimates.",
-      "grade_weakest": "C"
-    },
     "unsd_census_dates": {
       "name": "UNSD: 2020, 2010, 2000 and 1990 World Population and Housing Census Programme dates",
       "publisher": "United Nations Statistics Division",
@@ -436,7 +430,7 @@
       "publisher": "geoBoundaries, William & Mary geoLab",
       "url": "https://www.geoboundaries.org",
       "download": "https://www.geoboundaries.org/api/current/gbOpen/{iso}/ADM0/",
-      "licence": "Set per country (see data/raw/geoboundaries/*-meta.json): UGA and COD ODbL 1.0; TZA and RWA CC BY 4.0; KEN and BDI public domain",
+      "licence": "Set per country: UGA and COD ODbL 1.0 (source OpenStreetMap via Wambacher); TZA and RWA CC BY 4.0; KEN and BDI public domain. Everything derived from these outlines is published as one ODbL 1.0 package in site/data/boundary-derived/",
       "licence_checked": "2026-11-26, geoBoundaries API metadata",
       "citation": "Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866.",
       "native_grain": "Vector polygons (simplified)",

@@ -1,0 +1,151 @@
+{
+  "profile": "data-package",
+  "name": "wql-lake-victoria-boundary-derived",
+  "title": "Worldwide Quality of Life Map, Lake Victoria regional research preview: boundary-derived data",
+  "licenses": [
+    {
+      "name": "ODbL-1.0",
+      "title": "Open Data Commons Open Database License 1.0",
+      "path": "https://opendatacommons.org/licenses/odbl/1-0/"
+    }
+  ],
+  "contributors": [
+    {
+      "title": "geoBoundaries",
+      "path": "https://www.geoboundaries.org",
+      "role": "contributor"
+    },
+    {
+      "title": "OpenStreetMap contributors (via Wambacher), Uganda and DRC outlines",
+      "path": "https://www.openstreetmap.org/copyright",
+      "role": "contributor"
+    }
+  ],
+  "resources": [
+    {
+      "name": "boundaries",
+      "path": "boundaries.geojson",
+      "format": "geojson",
+      "mediatype": "application/geo+json",
+      "description": "Simplified ADM0 outlines; each feature's own licence is in its properties.",
+      "licenses": [
+        {
+          "name": "ODbL-1.0",
+          "path": "https://opendatacommons.org/licenses/odbl/1-0/"
+        }
+      ],
+      "sources": [
+        {
+          "title": "geoBoundaries gbOpen UGA ADM0 (Open Data Commons Open Database License 1.0)",
+          "path": "https://opendatacommons.org/licenses/odbl/1-0/"
+        },
+        {
+          "title": "geoBoundaries gbOpen KEN ADM0 (Public Domain)",
+          "path": "https://creativecommons.org/publicdomain/mark/1.0/"
+        },
+        {
+          "title": "geoBoundaries gbOpen TZA ADM0 (Creative Commons Attribution 4.0 (CC BY 4.0))",
+          "path": "https://creativecommons.org/licenses/by/4.0/"
+        },
+        {
+          "title": "geoBoundaries gbOpen RWA ADM0 (Creative Commons Attribution 4.0 (CC BY 4.0))",
+          "path": "https://creativecommons.org/licenses/by/4.0/"
+        },
+        {
+          "title": "geoBoundaries gbOpen BDI ADM0 (Public Domain)",
+          "path": "https://creativecommons.org/publicdomain/mark/1.0/"
+        },
+        {
+          "title": "geoBoundaries gbOpen COD ADM0 (Open Data Commons Open Database License 1.0)",
+          "path": "https://opendatacommons.org/licenses/odbl/1-0/"
+        }
+      ]
+    },
+    {
+      "name": "cell-countries",
+      "path": "cell-countries.csv",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "description": "Per H3 res-6 cell: country coverage, outline overlap, dispute flag, census age, population recency grade override.",
+      "licenses": [
+        {
+          "name": "ODbL-1.0",
+          "path": "https://opendatacommons.org/licenses/odbl/1-0/"
+        }
+      ],
+      "schema": {
+        "primaryKey": "cell_id",
+        "fields": [
+          {
+            "name": "cell_id",
+            "type": "string",
+            "description": "H3 index, resolution 6"
+          },
+          {
+            "name": "countries",
+            "type": "string",
+            "description": "ISO3 codes of outlines covering at least 1% of the cell, largest share first, ';'-separated"
+          },
+          {
+            "name": "country_area_shares",
+            "type": "string",
+            "description": "ISO3:share of cell area, ';'-separated"
+          },
+          {
+            "name": "outline_share",
+            "type": "number",
+            "description": "Share of the cell covered by any outline (capped at 1)"
+          },
+          {
+            "name": "outlines_overlap",
+            "type": "boolean",
+            "description": "Two outlines overlap inside the cell by more than 1% of its area"
+          },
+          {
+            "name": "no_outline",
+            "type": "boolean",
+            "description": "No outline covers the cell"
+          },
+          {
+            "name": "known_dispute",
+            "type": "string",
+            "description": "Name of a contested place in the cell, from a non-authoritative list"
+          },
+          {
+            "name": "census_age_years",
+            "type": "integer",
+            "description": "Years since the last census of the country covering most of the cell"
+          },
+          {
+            "name": "census_age_status",
+            "type": "string",
+            "description": "measured, lower bound, or absent"
+          },
+          {
+            "name": "census_years",
+            "type": "string",
+            "description": "ISO3:last census year for each covering country"
+          },
+          {
+            "name": "pop_recency_grade_override",
+            "type": "string",
+            "description": "Lowered recency grade (C or D) for the population layers where the census is more than 10 or 15 years old"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cell-countries-json",
+      "path": "cell-countries.json",
+      "format": "json",
+      "mediatype": "application/json",
+      "description": "The same cell records keyed by cell id, as the map reads them.",
+      "licenses": [
+        {
+          "name": "ODbL-1.0",
+          "path": "https://opendatacommons.org/licenses/odbl/1-0/"
+        }
+      ]
+    }
+  ]
+}

@@ -23,10 +23,10 @@
     "pop.ghsl": 0,
     "pop.worldpop": 1232,
     "pop.disagreement": 1884,
+    "pop.disagreement_abs": 1232,
     "urb.share": 1392,
     "acc.motor": 0,
     "acc.walk": 0,
-    "sec.conflict": 0,
     "kno.census_age": 1193
   },
   "boundary": {
@@ -94,89 +94,15 @@
       "note": "Last census 2022 (UNSD)."
     }
   },
-  "conflict": {
-    "period": [
-      2021,
-      2025
-    ],
-    "events_in_window": 1035,
-    "events_placed": 986,
-    "deaths_placed_best": 3990,
-    "unlocated": [
-      {
-        "country": "DR Congo (Zaire)",
-        "where_prec": 3,
-        "events": 18,
-        "deaths_best": 120,
-        "deaths_low": 110,
-        "deaths_high": 122
-      },
-      {
-        "country": "DR Congo (Zaire)",
-        "where_prec": 4,
-        "events": 16,
-        "deaths_best": 141,
-        "deaths_low": 75,
-        "deaths_high": 207
-      },
-      {
-        "country": "DR Congo (Zaire)",
-        "where_prec": 5,
-        "events": 5,
-        "deaths_best": 42,
-        "deaths_low": 42,
-        "deaths_high": 41
-      },
-      {
-        "country": "Kenya",
-        "where_prec": 3,
-        "events": 1,
-        "deaths_best": 3,
-        "deaths_low": 3,
-        "deaths_high": 3
-      },
-      {
-        "country": "Kenya",
-        "where_prec": 5,
-        "events": 1,
-        "deaths_best": 2,
-        "deaths_low": 2,
-        "deaths_high": 2
-      },
-      {
-        "country": "Tanzania",
-        "where_prec": 4,
-        "events": 1,
-        "deaths_best": 1,
-        "deaths_low": 1,
-        "deaths_high": 1
-      },
-      {
-        "country": "Uganda",
-        "where_prec": 4,
-        "events": 3,
-        "deaths_best": 4,
-        "deaths_low": 4,
-        "deaths_high": 7
-      },
-      {
-        "country": "Uganda",
-        "where_prec": 5,
-        "events": 3,
-        "deaths_best": 7,
-        "deaths_low": 6,
-        "deaths_high": 7
-      },
-      {
-        "country": "Uganda",
-        "where_prec": 6,
-        "events": 1,
-        "deaths_best": 1,
-        "deaths_low": 1,
-        "deaths_high": 1
-      }
-    ]
-  },
+  "release": "Lake Victoria regional research preview",
+  "withheld": [
+    {
+      "id": "sec.conflict",
+      "label": "Deaths in organised violence (UCDP GED)",
+      "reason": "Cell-level conflict records are withheld from this preview: 83 cells would show a single recorded event with its fatality estimate and range, which does not clear commitment C-11 (do no harm). A coarser conflict release will be proposed for separate review.",
+      "single_event_cells": 83
+    }
+  ],
   "population_totals": {
     "ghsl": 72385384,
     "worldpop": 71263233

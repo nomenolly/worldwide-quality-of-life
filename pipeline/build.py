@@ -205,12 +205,124 @@ def parse_census_dates():
     return out
 
 
+# ---------------------------------------------------------------- boundary-derived package (ODbL)
+
+ODBL_URL = "https://opendatacommons.org/licenses/odbl/1-0/"
+LICENCE_URLS = {
+    "Open Data Commons Open Database License 1.0": ODBL_URL,
+    "Creative Commons Attribution 4.0 (CC BY 4.0)": "https://creativecommons.org/licenses/by/4.0/",
+    "Public Domain": "https://creativecommons.org/publicdomain/mark/1.0/",
+}
+
+
+def write_boundary_package(bd: Path, feats: list) -> None:
+    """LICENSE.md and a Frictionless datapackage.json for the boundary-derived files.
+
+    The package as a whole is offered under ODbL 1.0 because it contains data
+    derived from the ODbL-licensed outlines of Uganda and DRC (ODbL 4.4: a
+    derivative database must be offered under ODbL; 4.6: it must be available
+    to anyone who receives a produced work made from it, here the map).
+    """
+    rows = "\n".join(
+        f"| {f['properties']['iso']} | {f['properties']['name']} | {f['properties']['source']} | "
+        f"{f['properties']['licence']} | {f['properties']['year']} |" for f in feats)
+    (bd / "LICENSE.md").write_text(f"""# Boundary-derived data: licence and attribution
+
+The files in this folder are the **boundary-derived database** of the Worldwide Quality of Life Map,
+Lake Victoria regional research preview:
+
+| File | Contents |
+|---|---|
+| `boundaries.geojson` | Simplified national outlines for six countries, one feature per country, with its licence |
+| `cell-countries.csv`, `cell-countries.json` | For each H3 res-6 cell: the countries whose outlines cover it and by what share, outline overlaps, the known-dispute flag, years since census (attached through the country), and the population recency grade that depends on it |
+| `datapackage.json` | Machine-readable description of these files and their licences (Frictionless Data Package) |
+
+## Licence
+
+This database is made available under the **Open Database License 1.0 (ODbL)**: {ODBL_URL}.
+Any rights in individual contents of the database are licensed under the Database Contents License:
+https://opendatacommons.org/licenses/dbcl/1-0/
+
+It is offered under ODbL because it contains data derived from the Uganda and Democratic Republic of the
+Congo outlines, which geoBoundaries distributes under ODbL 1.0 (source: OpenStreetMap, Wambacher). The
+outlines of the other countries keep their original terms as well (listed below), so material derived
+only from them may also be used under those terms.
+
+**Share-alike (ODbL 4.4).** If you publicly use an adapted version of this database, or a work produced
+from an adapted version, you must offer the adapted database under ODbL 1.0 too.
+
+**Keep it open (ODbL 4.6, 4.7).** If you redistribute this database or an adapted version, you may not
+apply technical restrictions that prevent others from using it, unless you also make an unrestricted
+version available.
+
+**Attribution (ODbL 4.2, 4.3).** Any public use or produced work must carry a notice such as:
+
+> Contains boundary-derived data from the Worldwide Quality of Life Map, made available under the
+> Open Database License 1.0. Country outlines from geoBoundaries (Runfola et al. 2020); Uganda and
+> DRC outlines © OpenStreetMap contributors (via Wambacher), ODbL 1.0.
+
+## Inputs
+
+| ISO | Name | Source (per geoBoundaries) | Licence | Year represented |
+|---|---|---|---|---|
+{rows}
+
+geoBoundaries: Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative
+boundaries. PLoS ONE 15(4): e0231866. https://www.geoboundaries.org
+
+## What these files are not
+
+Outlines are simplified and drawn for orientation. Where two outlines overlap, the files flag it as a
+disagreement between boundary sources, not a political dispute. The known-dispute flag is not drawn
+from a neutral register and is incomplete.
+""", encoding="utf-8")
+    contributors = [{"title": "geoBoundaries", "path": "https://www.geoboundaries.org", "role": "contributor"},
+                    {"title": "OpenStreetMap contributors (via Wambacher), Uganda and DRC outlines",
+                     "path": "https://www.openstreetmap.org/copyright", "role": "contributor"}]
+    pkg = {
+        "profile": "data-package",
+        "name": "wql-lake-victoria-boundary-derived",
+        "title": "Worldwide Quality of Life Map, Lake Victoria regional research preview: boundary-derived data",
+        "licenses": [{"name": "ODbL-1.0", "title": "Open Data Commons Open Database License 1.0", "path": ODBL_URL}],
+        "contributors": contributors,
+        "resources": [
+            {"name": "boundaries", "path": "boundaries.geojson", "format": "geojson", "mediatype": "application/geo+json",
+             "description": "Simplified ADM0 outlines; each feature's own licence is in its properties.",
+             "licenses": [{"name": "ODbL-1.0", "path": ODBL_URL}],
+             "sources": [{"title": f"geoBoundaries gbOpen {f['properties']['iso']} ADM0 ({f['properties']['licence']})",
+                          "path": LICENCE_URLS.get(f['properties']['licence'], "https://www.geoboundaries.org")} for f in feats]},
+            {"name": "cell-countries", "path": "cell-countries.csv", "format": "csv", "mediatype": "text/csv",
+             "description": "Per H3 res-6 cell: country coverage, outline overlap, dispute flag, census age, population recency grade override.",
+             "licenses": [{"name": "ODbL-1.0", "path": ODBL_URL}],
+             "schema": {"primaryKey": "cell_id", "fields": [
+                 {"name": "cell_id", "type": "string", "description": "H3 index, resolution 6"},
+                 {"name": "countries", "type": "string", "description": "ISO3 codes of outlines covering at least 1% of the cell, largest share first, ';'-separated"},
+                 {"name": "country_area_shares", "type": "string", "description": "ISO3:share of cell area, ';'-separated"},
+                 {"name": "outline_share", "type": "number", "description": "Share of the cell covered by any outline (capped at 1)"},
+                 {"name": "outlines_overlap", "type": "boolean", "description": "Two outlines overlap inside the cell by more than 1% of its area"},
+                 {"name": "no_outline", "type": "boolean", "description": "No outline covers the cell"},
+                 {"name": "known_dispute", "type": "string", "description": "Name of a contested place in the cell, from a non-authoritative list"},
+                 {"name": "census_age_years", "type": "integer", "description": "Years since the last census of the country covering most of the cell"},
+                 {"name": "census_age_status", "type": "string", "description": "measured, lower bound, or absent"},
+                 {"name": "census_years", "type": "string", "description": "ISO3:last census year for each covering country"},
+                 {"name": "pop_recency_grade_override", "type": "string", "description": "Lowered recency grade (C or D) for the population layers where the census is more than 10 or 15 years old"}]}},
+            {"name": "cell-countries-json", "path": "cell-countries.json", "format": "json", "mediatype": "application/json",
+             "description": "The same cell records keyed by cell id, as the map reads them.",
+             "licenses": [{"name": "ODbL-1.0", "path": ODBL_URL}]},
+        ],
+    }
+    write_json(bd / "datapackage.json", pkg, compact=False)
+
+
 # ---------------------------------------------------------------- main build
 
 def main() -> int:
     R = load_region()
     reg, res, as_of = R["region"], R["substrate"]["h3_resolution"], R["reference"]["as_of_year"]
     S = load_sources()
+    REL = R.get("release", {})
+    withheld = set(REL.get("withheld", []))
+    BOUNDARY_DERIVED = {"kno.census_age"}  # per-cell values that exist only through the country assignment
 
     print("substrate")
     cells = build_substrate(reg, res)
@@ -260,11 +372,13 @@ def main() -> int:
         age = max(ages)
         return "A" if age <= 5 else "B" if age <= 10 else "C" if age <= 15 else "D"
 
+    # This override depends on the country assignment, so it is published with the
+    # boundary-derived package (ODbL), not in observations.json.
+    pop_recency = {}
     for cid in cells.index:
         rg = census_recency(cid)
-        for ind in ("pop.ghsl", "pop.worldpop"):
-            if obs[cid][ind]["st"] != "absent" and rg in ("C", "D"):
-                obs[cid][ind]["g"] = {"recency": rg}
+        if rg in ("C", "D"):
+            pop_recency[cid] = rg
 
     # ---- population disagreement (indicator 14)
     print("population disagreement")
@@ -273,13 +387,16 @@ def main() -> int:
         g, w = obs[cid]["pop.ghsl"], obs[cid]["pop.worldpop"]
         if g["st"] == "absent" or w["st"] == "absent":
             absent(cid, "pop.disagreement", "One of the two population sources has no value here.")
+            absent(cid, "pop.disagreement_abs", "One of the two population sources has no value here.")
             continue
         G, W = g["v"], w["v"]
+        obs[cid]["pop.disagreement_abs"] = {"v": round(W - G), "st": "derived", "x": {"ghsl": G, "worldpop": W}}
         if max(G, W) < MIN_PEOPLE:
             absent(cid, "pop.disagreement", f"Both sources estimate fewer than {MIN_PEOPLE} people; a percentage difference would mostly be noise.")
             continue
         d = (W - G) / ((W + G) / 2) * 100
-        obs[cid]["pop.disagreement"] = {"v": round(d, 1), "st": "derived", "x": {"ghsl": G, "worldpop": W}}
+        obs[cid]["pop.disagreement"] = {"v": round(d, 1), "st": "derived",
+                                        "x": {"ghsl": G, "worldpop": W, "abs_diff": round(W - G)}}
 
     # ---- urbanisation: GHS-SMOD, population share by settlement class
     print("urbanisation: GHS-SMOD")
@@ -414,13 +531,22 @@ def main() -> int:
              pixel_lineage + ["Sum pixel populations per cell"],
              "Constrained product: people are placed only where settlement is mapped, so many rural cells are empty here but not in GHSL. National totals are adjusted to UN estimates.",
              {"type": "log", "palette": "seq"}),
-        meta("pop.disagreement", "Population disagreement (WorldPop vs GHSL)", "Knowledge: data quality", "% of mean",
+        meta("pop.disagreement", "Population disagreement, relative (WorldPop vs GHSL)", "Knowledge: data quality", "% of mean",
              "worldpop_2020",
              ["Take pop.ghsl and pop.worldpop for the cell",
               f"Skip cells where both are below {MIN_PEOPLE} people",
-              "Compute (WorldPop - GHSL) / mean(WorldPop, GHSL) x 100"],
-             "A measure of how far two reputable models disagree, not of which is right. Positive means WorldPop places more people here than GHSL.",
-             {"type": "diverging", "palette": "div", "domain": [-200, 200]},
+              "Relative difference = (WorldPop - GHSL) / mean(WorldPop, GHSL) x 100",
+              "Absolute difference = WorldPop - GHSL, in people"],
+             "A measure of how far two reputable models disagree, not of which is right. Two measures are shown together: the relative difference (mapped, % of the mean of the two) and the absolute difference in people (in the inspector and downloads). Positive means WorldPop places more people here than GHSL.",
+             {"type": "diverging", "palette": "div", "breaks": [-100, -50, -20, 0, 20, 50, 100]},
+             grade={"recency": "B", "directness": "C", "spatial_fidelity": "A", "coverage": "B",
+                    "validation": "C", "interval": "D"}, status="derived",
+             extra={"sources": ["ghsl_pop_2020", "worldpop_2020"]}),
+        meta("pop.disagreement_abs", "Population disagreement, absolute (WorldPop minus GHSL)", "Knowledge: data quality",
+             "people", "worldpop_2020",
+             ["Take pop.ghsl and pop.worldpop for the cell", "Absolute difference = WorldPop - GHSL, in people"],
+             "The companion to the relative disagreement layer. Large absolute gaps sit in dense places even when the relative gap is small; large relative gaps can sit in places with few people. Read the two together. Positive means WorldPop places more people here than GHSL.",
+             {"type": "diverging", "palette": "div", "breaks": [-5000, -1000, -200, 0, 200, 1000, 5000]},
              grade={"recency": "B", "directness": "C", "spatial_fidelity": "A", "coverage": "B",
                     "validation": "C", "interval": "D"}, status="derived",
              extra={"sources": ["ghsl_pop_2020", "worldpop_2020"]}),
@@ -463,7 +589,23 @@ def main() -> int:
              "A national fact spread over every cell, so it is the same for a capital and a remote valley. It matters because every population model above is anchored to these censuses.",
              {"type": "linear", "palette": "seq", "domain": [0, 45]}),
     ]
+    # Withheld layers leave no trace in any output (C-11). Only an aggregate count of
+    # single-event cells is kept, to document why.
+    withheld_info = []
+    if "sec.conflict" in withheld:
+        n_single = sum(1 for cid in cells.index if obs[cid]["sec.conflict"].get("n") == 1)
+        withheld_info.append({"id": "sec.conflict", "label": "Deaths in organised violence (UCDP GED)",
+                              "reason": REL.get("withheld_reason", ""), "single_event_cells": n_single})
+    indicators = [m for m in indicators if m["id"] not in withheld]
+    for cid in cells.index:
+        for w in withheld:
+            obs[cid].pop(w, None)
+    for m in indicators:
+        if m["id"] in BOUNDARY_DERIVED:
+            m["package"] = "boundary-derived"
+            m["licence_note"] = "Per-cell values derive from geoBoundaries outlines, so they are published in the ODbL boundary-derived package."
     ind_ids = [m["id"] for m in indicators]
+    obs_ids = [i for i in ind_ids if i not in BOUNDARY_DERIVED]
 
     # ---------------------------------------------------------------- outputs
     print("writing outputs")
@@ -476,14 +618,15 @@ def main() -> int:
                     "n_source_units", "note"])
         for cid in cells.index:
             pw = obs[cid]["pop.ghsl"].get("v", "")
-            for ind in ind_ids:
+            for ind in obs_ids:
                 o, m = obs[cid][ind], ind_by_id[ind]
                 gd = {**m["grade_detail"], **o.get("g", {})}
                 w.writerow([cid, ind, (m["period"] or ["", ""])[0], (m["period"] or ["", ""])[1],
                             o.get("v", ""), o.get("lo", ""), o.get("hi", ""), o["st"],
                             weakest(gd) if o["st"] != "absent" else "",
                             json.dumps(gd, separators=(",", ":")) if o["st"] != "absent" else "",
-                            m["source_id"], pw, o.get("n", ""), o.get("why", "")])
+                            m["source_id"], pw, o.get("n", ""),
+                            o.get("why", "") or (f"absolute difference {o['x']['abs_diff']} people" if ind == "pop.disagreement" else "")])
     # Lineage is per indicator, so it is written once rather than on 75,000 rows.
     with open(PROCESSED / "indicators.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -503,26 +646,50 @@ def main() -> int:
 
     cell_out = {}
     for cid in cells.index:
-        a = ca.loc[cid]
-        flags = {"countries": a.countries, "shares": a.shares, "outline_share": a.outline_share}
-        if a.boundary_disagreement:
-            flags["boundary_disagreement"] = True
-        if a.no_country:
-            flags["no_country"] = True
-        if cid in disputes:
-            flags["known_dispute"] = disputes[cid]["name"]
-        cell_out[cid] = {"o": {ind: obs[cid][ind] for ind in ind_ids}, "f": flags,
+        cell_out[cid] = {"o": {ind: obs[cid][ind] for ind in obs_ids},
                          "c": [round(cells.loc[cid, "lat"], 4), round(cells.loc[cid, "lng"], 4)],
                          "a": round(cells.loc[cid, "area_km2"], 2)}
     write_json(SITE_DATA / "observations.json", cell_out)
 
-    sources_out = {k: {kk: vv for kk, vv in v.items() if kk not in ("tiles", "variants")} for k, v in S.items()}
+    # ---- boundary-derived package (ODbL 1.0): outlines, cell-country assignment,
+    # and every per-cell value that exists only through that assignment.
+    BD = SITE_DATA / "boundary-derived"
+    bd_cells = {}
+    with open(BD.mkdir(parents=True, exist_ok=True) or BD / "cell-countries.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["cell_id", "countries", "country_area_shares", "outline_share", "outlines_overlap",
+                    "no_outline", "known_dispute", "census_age_years", "census_age_status", "census_years",
+                    "pop_recency_grade_override"])
+        for cid in cells.index:
+            a = ca.loc[cid]
+            rec = {"countries": a.countries, "shares": a.shares, "outline_share": a.outline_share}
+            if a.boundary_disagreement:
+                rec["boundary_disagreement"] = True
+            if a.no_country:
+                rec["no_country"] = True
+            if cid in disputes:
+                rec["known_dispute"] = disputes[cid]["name"]
+            rec["o"] = {i: obs[cid][i] for i in ind_ids if i in BOUNDARY_DERIVED}
+            if cid in pop_recency:
+                rec["pop_recency"] = pop_recency[cid]
+            bd_cells[cid] = rec
+            ce = obs[cid]["kno.census_age"]
+            w.writerow([cid, ";".join(a.countries), ";".join(f"{k}:{v}" for k, v in a.shares), a.outline_share,
+                        bool(a.boundary_disagreement), bool(a.no_country), rec.get("known_dispute", ""),
+                        ce.get("v", ""), ce["st"],
+                        ";".join(f"{k}:{c['year']}" for k, c in ce.get("x", {}).get("countries", {}).items()),
+                        pop_recency.get(cid, "")])
+    write_json(BD / "cell-countries.json", bd_cells)
+    write_json(BD / "boundaries.geojson", {"type": "FeatureCollection", "features": boundary_feats})
+    write_boundary_package(BD, boundary_feats)
+
+    used = {m["source_id"] for m in indicators} | {x for m in indicators for x in m.get("sources", [])} | {"geoboundaries_adm0"}
+    sources_out = {k: {kk: vv for kk, vv in v.items() if kk not in ("tiles", "variants")} for k, v in S.items() if k in used}
     for v in sources_out.values():
         if "grade" in v:
             v["grade_weakest"] = weakest(v["grade"])
     write_json(SITE_DATA / "indicators.json", {"indicators": indicators, "sources": sources_out,
                                               "dimensions": DIMENSIONS}, compact=False)
-    write_json(SITE_DATA / "boundaries.geojson", {"type": "FeatureCollection", "features": boundary_feats})
 
     absent_counts = {ind: sum(1 for cid in cells.index if obs[cid][ind]["st"] == "absent") for ind in ind_ids}
     region_out = {
@@ -534,15 +701,18 @@ def main() -> int:
                      "border_cells": int(ca.border_cell.sum()),
                      "known_disputes": KNOWN_DISPUTES, "registered_not_placed": REGISTERED_NOT_PLACED},
         "census": census,
-        "conflict": {"period": [y0, y1], "events_in_window": int(len(ged)),
-                     "events_placed": int(len(located)), "deaths_placed_best": int(located.best.sum()),
-                     "unlocated": unlocated.to_dict(orient="records")},
+        "release": REL.get("name", ""),
+        "withheld": withheld_info,
         "population_totals": {"ghsl": round(float(sum(obs[c]["pop.ghsl"].get("v", 0) for c in cells.index))),
                               "worldpop": round(float(sum(obs[c]["pop.worldpop"].get("v", 0) for c in cells.index)))},
     }
     write_json(SITE_DATA / "region.json", region_out, compact=False)
-    print(json.dumps({k: region_out[k] for k in ("n_cells", "absent_counts", "boundary", "population_totals")}
-                     | {"conflict": {k: v for k, v in region_out["conflict"].items() if k != "unlocated"}},
+    if "sec.conflict" not in withheld:
+        region_out["conflict"] = {"period": [y0, y1], "events_in_window": int(len(ged)),
+                                  "events_placed": int(len(located)), "deaths_placed_best": int(located.best.sum()),
+                                  "unlocated": unlocated.to_dict(orient="records")}
+        write_json(SITE_DATA / "region.json", region_out, compact=False)
+    print(json.dumps({k: region_out[k] for k in ("n_cells", "absent_counts", "population_totals", "withheld")},
                      indent=1, default=str)[:3000])
     return 0
 
