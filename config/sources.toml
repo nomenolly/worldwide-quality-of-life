@@ -1,0 +1,107 @@
+# Source registry. Every observation on the map points to one of these
+# entries through its source_id. Licences were checked on the dates given;
+# see docs/WQL-002-report.md for what is still unconfirmed.
+#
+# Evidence grades use the six WQL-001 dimensions (section 2.3), each A to D.
+# The grade shown on the map is the weakest of the six, used as a flag, never
+# as a score. Grades here are source-level defaults; the pipeline lowers
+# individual dimensions per cell where it knows more (for example the
+# location precision of conflict events).
+
+[ghsl_pop_2020]
+name = "GHS-POP R2023A, epoch 2020"
+publisher = "European Commission, Joint Research Centre (GHSL)"
+url = "https://human-settlement.emergency.copernicus.eu/download.php?ds=pop"
+download = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_4326_30ss/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0_{tile}.zip"
+tiles = ["R9_C22", "R10_C22"]
+licence = "CC BY 4.0"
+licence_checked = "2026-11-26, copyright.txt in the download folder"
+citation = "Schiavina M., Freire S., Carioli A., MacManus K. (2023): GHS-POP R2023A - GHS population grid multitemporal (1975-2030). European Commission, Joint Research Centre. doi:10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE"
+native_grain = "30 arc-second raster (about 0.93 km at the equator), WGS84; JRC's own resampling of the 100 m / 1 km Mollweide product"
+reference_period = ["2020-01-01", "2020-12-31"]
+status = "modelled"
+grade = { recency = "B", directness = "C", spatial_fidelity = "A", coverage = "A", validation = "B", interval = "D" }
+grade_notes = "Modelled from census counts disaggregated onto built-up surface. No per-pixel interval is published. Recency is lowered per cell where the country's census inputs are old (see kno.census_age)."
+
+[worldpop_2020]
+name = "WorldPop Global2 R2025A, 2020, constrained, UN-adjusted, 1 km"
+publisher = "WorldPop, University of Southampton"
+url = "https://hub.worldpop.org/project/categories?id=3"
+download = "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/0_Mosaicked/v1/1km_ua/constrained/global_pop_2020_CN_1km_R2025A_UA_v1.tif"
+licence = "CC BY 4.0 (stated by the Google Earth Engine catalogue; WorldPop's own pages state none)"
+licence_checked = "2026-11-26, partly verified: confirm with WorldPop before redistributing derived rasters"
+citation = "WorldPop (www.worldpop.org). Global2 R2025A population estimates, 2020, 1 km, constrained, UN-adjusted. University of Southampton. Labelled alpha by the publisher."
+native_grain = "30 arc-second raster (about 0.93 km), WGS84"
+reference_period = ["2020-01-01", "2020-12-31"]
+status = "modelled"
+grade = { recency = "B", directness = "C", spatial_fidelity = "A", coverage = "A", validation = "C", interval = "D" }
+grade_notes = "Release labelled alpha. Totals adjusted to UN WPP national estimates, so national totals are not independent of other sources. WorldPop asks that the data not be used to discriminate, exploit or surveil."
+
+[ghsl_smod_2020]
+name = "GHS-SMOD R2023A, epoch 2020 (Degree of Urbanisation, level 2)"
+publisher = "European Commission, Joint Research Centre (GHSL)"
+url = "https://human-settlement.emergency.copernicus.eu/download.php?ds=smod"
+download = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_SMOD_GLOBE_R2023A/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss/V2-0/tiles/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss_V2_0_{tile}.zip"
+tiles = ["R9_C22", "R10_C22"]
+licence = "CC BY 4.0"
+licence_checked = "2026-11-26, copyright.txt in the download folder"
+citation = "Schiavina M., Melchiorri M., Pesaresi M. (2023): GHS-SMOD R2023A - GHS settlement layers, application of the Degree of Urbanisation methodology (stage I) to GHS-POP R2023A and GHS-BUILT-S R2023A, multitemporal (1975-2030). European Commission, Joint Research Centre. doi:10.2905/A0DF7A6F-49DE-46EA-9BDE-563437A6E2BA"
+native_grain = "30 arc-second raster (about 0.93 km), WGS84; JRC's resampling of the native 1 km Mollweide grid"
+reference_period = ["2020-01-01", "2020-12-31"]
+status = "modelled"
+grade = { recency = "B", directness = "C", spatial_fidelity = "A", coverage = "A", validation = "B", interval = "D" }
+grade_notes = "A classification derived from GHS-POP and GHS-BUILT-S, so it shares their modelling assumptions and is not independent of the population layer."
+
+[map_travel_2020]
+name = "Malaria Atlas Project: travel time to healthcare, 2020 (motorised and walking-only)"
+publisher = "Malaria Atlas Project; Weiss et al. 2020"
+url = "https://malariaatlas.org/open-access-policy/"
+download = "https://data.malariaatlas.org/geoserver/Accessibility/ows?service=WCS&version=2.0.1&request=GetCoverage&coverageId=Accessibility__202001_Global_{variant}&subset=Lat({south},{north})&subset=Long({west},{east})&format=image/geotiff"
+variants = ["Motorized_Travel_Time_to_Healthcare", "Walking_Only_Travel_Time_To_Healthcare"]
+licence = "CC BY 3.0 Unported"
+licence_checked = "2026-11-26, per WQL-001 section 4.6"
+citation = "Weiss D.J., Nelson A., Vargas-Ruiz C.A., et al. (2020). Global maps of travel time to healthcare facilities. Nature Medicine 26, 1835-1838. doi:10.1038/s41591-020-1059-1"
+native_grain = "30 arc-second raster (about 0.93 km), WGS84"
+reference_period = ["2019-01-01", "2020-12-31"]
+status = "modelled"
+grade = { recency = "C", directness = "C", spatial_fidelity = "A", coverage = "B", validation = "C", interval = "D" }
+grade_notes = "A least-cost model over a friction surface and a facility list. Facility coverage in the source list varies by country and is not quantified here. Travel time to the nearest facility says nothing about the facility's quality, staffing or cost."
+
+[ucdp_ged_261]
+name = "UCDP Georeferenced Event Dataset (GED) Global version 26.1"
+publisher = "Uppsala Conflict Data Program, Uppsala University"
+url = "https://ucdp.uu.se/downloads/"
+download = "https://ucdp.uu.se/downloads/ged/ged261-csv.zip"
+licence = "CC BY 4.0"
+licence_checked = "2026-11-26, per WQL-001 section 4.6"
+citation = "Sundberg, Ralph, and Erik Melander, 2013, 'Introducing the UCDP Georeferenced Event Dataset', Journal of Peace Research 50(4): 523-532. Högbladh, Stina, 2026, 'UCDP GED Codebook version 26.1', Department of Peace and Conflict Research, Uppsala University."
+native_grain = "Event points with a location precision code (1 exact, 2 within 25 km, 3 ADM2, 4 ADM1, 5 linear or fuzzy feature, 6 country, 7 international waters)"
+reference_period = ["2021-01-01", "2025-12-31"]
+status = "measured"
+grade = { recency = "A", directness = "B", spatial_fidelity = "B", coverage = "C", validation = "B", interval = "B" }
+grade_notes = "Event-coded from news and NGO reporting, so it records reported organised violence with at least one death, not all violence. Coverage is weakest where reporting is weakest. Deaths carry low, best and high estimates."
+
+[unsd_census_dates]
+name = "UNSD: 2020, 2010, 2000 and 1990 World Population and Housing Census Programme dates"
+publisher = "United Nations Statistics Division"
+url = "https://unstats.un.org/unsd/demographic-social/census/censusdates/"
+download = "https://unstats.un.org/unsd/demographic-social/census/censusdates/"
+licence = "UN web page; facts transcribed (dates are not copyrightable data, but the page carries no open licence)"
+licence_checked = "2026-11-26"
+citation = "United Nations Statistics Division, census dates by country, page updated 3 February 2026."
+native_grain = "Country"
+reference_period = ["1985-01-01", "2026-11-26"]
+status = "measured"
+grade = { recency = "A", directness = "A", spatial_fidelity = "D", coverage = "A", validation = "B", interval = "C" }
+grade_notes = "A national fact spread over every cell in the country, so spatial fidelity is D by construction."
+
+[geoboundaries_adm0]
+name = "geoBoundaries gbOpen ADM0 (simplified)"
+publisher = "geoBoundaries, William & Mary geoLab"
+url = "https://www.geoboundaries.org"
+download = "https://www.geoboundaries.org/api/current/gbOpen/{iso}/ADM0/"
+licence = "Set per country (see data/raw/geoboundaries/*-meta.json): UGA and COD ODbL 1.0; TZA and RWA CC BY 4.0; KEN and BDI public domain"
+licence_checked = "2026-11-26, geoBoundaries API metadata"
+citation = "Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866."
+native_grain = "Vector polygons (simplified)"
+status = "measured"

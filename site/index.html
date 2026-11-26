@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worldwide Quality of Life Map: Great Lakes proof of concept</title>
+<meta name="description" content="WQL-002 regional proof of concept: real observations on an H3 grid around Lake Victoria, with provenance, native resolution and evidence grades on every value. No scores, no rankings.">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="title">
+    <strong>Worldwide Quality of Life Map</strong>
+    <span class="sub">WQL-002 proof of concept · Lake Victoria window (2°S–3°N, 30°E–36°E) · H3 res 6</span>
+  </div>
+  <nav>
+    <a href="limits.html">Limits of this map</a>
+    <a href="https://github.com/nomenolly/worldwide-quality-of-life/blob/main/docs/WQL-002-report.md">Missing data and failures</a>
+    <a href="https://github.com/nomenolly/worldwide-quality-of-life">Source code</a>
+  </nav>
+</header>
+<main>
+  <section id="mapwrap">
+    <div id="controls">
+      <label for="layer">Layer</label>
+      <select id="layer"></select>
+      <label class="chk"><input type="checkbox" id="basemap" checked> Basemap</label>
+      <label class="chk"><input type="checkbox" id="outlines" checked> Country outlines</label>
+      <div id="legend" aria-live="polite"></div>
+    </div>
+    <div id="map" role="application" aria-label="Map of H3 cells. Click a cell to inspect its observations."></div>
+  </section>
+  <aside id="inspector" aria-live="polite">
+    <div id="intro">
+      <h2>Click any cell</h2>
+      <p>Each hexagon is an H3 resolution-6 cell, about 36 km² on average worldwide (about 40 km² here, near the equator). The hexagon is a <em>common index</em> for joining observations, not a claim that any source measures at that precision. Every value below shows the grid or points it was measured on and how many of them fell in the cell.</p>
+      <p>Values are shown one layer at a time. Nothing is combined into a score, and nothing is ranked. Hatched cells have no value, and the inspector says why.</p>
+      <p id="summary"></p>
+    </div>
+    <div id="cell" hidden></div>
+  </aside>
+</main>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+      <rect width="6" height="6"></rect>
+      <line x1="0" y1="0" x2="0" y2="6"></line>
+    </pattern>
+  </defs>
+</svg>
+<script src="vendor/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

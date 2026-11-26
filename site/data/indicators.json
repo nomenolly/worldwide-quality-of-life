@@ -1,0 +1,454 @@
+{
+  "indicators": [
+    {
+      "id": "pop.ghsl",
+      "label": "Population (GHSL, primary)",
+      "domain": "Context: population",
+      "unit": "people",
+      "source_id": "ghsl_pop_2020",
+      "period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "native_grain": "30 arc-second raster (about 0.93 km at the equator), WGS84; JRC's own resampling of the 100 m / 1 km Mollweide product",
+      "status": "modelled",
+      "lineage": [
+        "Read the 30 arc-second raster over the window (+0.1° pad)",
+        "Assign each pixel to the H3 res-6 cell containing the pixel centre",
+        "Sum pixel populations per cell"
+      ],
+      "grade_detail": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "D"
+      },
+      "grade": "D",
+      "caveat": "Modelled residential population for 2020. Not a count. Pixel-centre assignment means cells on the edge of a dense town can gain or lose a few hundred people relative to an exact area-weighted split.",
+      "scale": {
+        "type": "log",
+        "palette": "seq"
+      }
+    },
+    {
+      "id": "pop.worldpop",
+      "label": "Population (WorldPop, secondary)",
+      "domain": "Context: population",
+      "unit": "people",
+      "source_id": "worldpop_2020",
+      "period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84",
+      "status": "modelled",
+      "lineage": [
+        "Read the 30 arc-second raster over the window (+0.1° pad)",
+        "Assign each pixel to the H3 res-6 cell containing the pixel centre",
+        "Sum pixel populations per cell"
+      ],
+      "grade_detail": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade": "D",
+      "caveat": "Constrained product: people are placed only where settlement is mapped, so many rural cells are empty here but not in GHSL. National totals are adjusted to UN estimates.",
+      "scale": {
+        "type": "log",
+        "palette": "seq"
+      }
+    },
+    {
+      "id": "pop.disagreement",
+      "label": "Population disagreement (WorldPop vs GHSL)",
+      "domain": "Knowledge: data quality",
+      "unit": "% of mean",
+      "source_id": "worldpop_2020",
+      "period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84",
+      "status": "derived",
+      "lineage": [
+        "Take pop.ghsl and pop.worldpop for the cell",
+        "Skip cells where both are below 100 people",
+        "Compute (WorldPop - GHSL) / mean(WorldPop, GHSL) x 100"
+      ],
+      "grade_detail": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "B",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade": "D",
+      "caveat": "A measure of how far two reputable models disagree, not of which is right. Positive means WorldPop places more people here than GHSL.",
+      "scale": {
+        "type": "diverging",
+        "palette": "div",
+        "domain": [
+          -200,
+          200
+        ]
+      },
+      "sources": [
+        "ghsl_pop_2020",
+        "worldpop_2020"
+      ]
+    },
+    {
+      "id": "urb.share",
+      "label": "Urban population share (GHS-SMOD)",
+      "domain": "Context: settlement",
+      "unit": "% of cell population",
+      "source_id": "ghsl_smod_2020",
+      "period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84; JRC's resampling of the native 1 km Mollweide grid",
+      "status": "modelled",
+      "lineage": [
+        "Read the 30 arc-second raster over the window (+0.1° pad)",
+        "Assign each pixel to the H3 res-6 cell containing the pixel centre",
+        "Weight each pixel by its GHS-POP 2020 population (same grid)",
+        "Urban share = population in urban centres (class 30) + urban clusters (21-23), over all non-water population"
+      ],
+      "grade_detail": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "D"
+      },
+      "grade": "D",
+      "caveat": "Degree of Urbanisation classes are a harmonised international definition, not national definitions of 'urban'. The inspector shows the urban centre / urban cluster / rural split.",
+      "scale": {
+        "type": "linear",
+        "palette": "seq",
+        "domain": [
+          0,
+          100
+        ]
+      }
+    },
+    {
+      "id": "acc.motor",
+      "label": "Travel time to nearest health facility, motorised",
+      "domain": "Health access",
+      "unit": "minutes",
+      "source_id": "map_travel_2020",
+      "period": [
+        "2019-01-01",
+        "2020-12-31"
+      ],
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84",
+      "status": "modelled",
+      "lineage": [
+        "Request the 30 arc-second WCS subset for the window (+0.5° pad)",
+        "Assign each pixel to the H3 res-6 cell containing the pixel centre",
+        "Weight each pixel by GHS-POP 2020 sampled at the pixel centre (nearest pixel)",
+        "Population-weighted mean per cell; unweighted mean where nobody lives"
+      ],
+      "grade_detail": {
+        "recency": "C",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "B",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade": "D",
+      "caveat": "Modelled best-case travel time assuming motorised transport is available. Says nothing about facility quality, staffing, cost or opening hours. The inspector shows the within-cell minimum and maximum, which is spread, not uncertainty.",
+      "scale": {
+        "type": "log",
+        "palette": "seq"
+      }
+    },
+    {
+      "id": "acc.walk",
+      "label": "Travel time to nearest health facility, walking only",
+      "domain": "Health access",
+      "unit": "minutes",
+      "source_id": "map_travel_2020",
+      "period": [
+        "2019-01-01",
+        "2020-12-31"
+      ],
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84",
+      "status": "modelled",
+      "lineage": [
+        "Request the 30 arc-second WCS subset for the window (+0.5° pad)",
+        "Assign each pixel to the H3 res-6 cell containing the pixel centre",
+        "Weight each pixel by GHS-POP 2020 sampled at the pixel centre (nearest pixel)",
+        "Population-weighted mean per cell; unweighted mean where nobody lives"
+      ],
+      "grade_detail": {
+        "recency": "C",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "B",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade": "D",
+      "caveat": "Modelled walking time with no vehicle. Same facility list and caveats as the motorised layer.",
+      "scale": {
+        "type": "log",
+        "palette": "seq"
+      }
+    },
+    {
+      "id": "sec.conflict",
+      "label": "Deaths in organised violence, 2021-2025 (UCDP GED)",
+      "domain": "Physical security",
+      "unit": "deaths (5-year total)",
+      "source_id": "ucdp_ged_261",
+      "period": [
+        "2021-01-01",
+        "2025-12-31"
+      ],
+      "native_grain": "Event points with a location precision code (1 exact, 2 within 25 km, 3 ADM2, 4 ADM1, 5 linear or fuzzy feature, 6 country, 7 international waters)",
+      "status": "measured",
+      "lineage": [
+        "Keep events dated 2021-2025 with coordinates inside the window",
+        "Keep events located exactly (precision 1) or within 25 km of a known point (precision 2)",
+        "Assign each event to the H3 res-6 cell containing its coded point",
+        "Sum best, low and high death estimates per cell over the five years",
+        "Events located only to an administrative area or coarser are counted per country, not placed"
+      ],
+      "grade_detail": {
+        "recency": "A",
+        "directness": "B",
+        "spatial_fidelity": "B",
+        "coverage": "C",
+        "validation": "B",
+        "interval": "B"
+      },
+      "grade": "C",
+      "caveat": "Recorded deaths in state-based, non-state and one-sided violence with at least 25 deaths per year in the conflict or dyad. A zero means no recorded event, not no violence. Precision-2 events may have happened up to 25 km away, i.e. in a neighbouring cell. Only five-year cell totals are published; no event-level detail is shown.",
+      "scale": {
+        "type": "log",
+        "palette": "seq"
+      },
+      "interval_meaning": "UCDP low and high death estimates, summed"
+    },
+    {
+      "id": "kno.census_age",
+      "label": "Years since the last population census",
+      "domain": "Knowledge: data quality",
+      "unit": "years",
+      "source_id": "unsd_census_dates",
+      "period": [
+        "1985-01-01",
+        "2026-11-26"
+      ],
+      "native_grain": "Country",
+      "status": "measured",
+      "lineage": [
+        "Transcribe the most recent completed census per country from the UNSD page",
+        "Years since = 2026 - census year",
+        "Attach to every cell that a country's geoBoundaries outline covers (at least 1% of the cell)",
+        "A cell covered by two or more outlines shows the country covering most of it; the inspector lists the others"
+      ],
+      "grade_detail": {
+        "recency": "A",
+        "directness": "A",
+        "spatial_fidelity": "D",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "C"
+      },
+      "grade": "D",
+      "caveat": "A national fact spread over every cell, so it is the same for a capital and a remote valley. It matters because every population model above is anchored to these censuses.",
+      "scale": {
+        "type": "linear",
+        "palette": "seq",
+        "domain": [
+          0,
+          45
+        ]
+      }
+    }
+  ],
+  "sources": {
+    "ghsl_pop_2020": {
+      "name": "GHS-POP R2023A, epoch 2020",
+      "publisher": "European Commission, Joint Research Centre (GHSL)",
+      "url": "https://human-settlement.emergency.copernicus.eu/download.php?ds=pop",
+      "download": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_4326_30ss/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0_{tile}.zip",
+      "licence": "CC BY 4.0",
+      "licence_checked": "2026-11-26, copyright.txt in the download folder",
+      "citation": "Schiavina M., Freire S., Carioli A., MacManus K. (2023): GHS-POP R2023A - GHS population grid multitemporal (1975-2030). European Commission, Joint Research Centre. doi:10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE",
+      "native_grain": "30 arc-second raster (about 0.93 km at the equator), WGS84; JRC's own resampling of the 100 m / 1 km Mollweide product",
+      "reference_period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "status": "modelled",
+      "grade": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "D"
+      },
+      "grade_notes": "Modelled from census counts disaggregated onto built-up surface. No per-pixel interval is published. Recency is lowered per cell where the country's census inputs are old (see kno.census_age).",
+      "grade_weakest": "D"
+    },
+    "worldpop_2020": {
+      "name": "WorldPop Global2 R2025A, 2020, constrained, UN-adjusted, 1 km",
+      "publisher": "WorldPop, University of Southampton",
+      "url": "https://hub.worldpop.org/project/categories?id=3",
+      "download": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/0_Mosaicked/v1/1km_ua/constrained/global_pop_2020_CN_1km_R2025A_UA_v1.tif",
+      "licence": "CC BY 4.0 (stated by the Google Earth Engine catalogue; WorldPop's own pages state none)",
+      "licence_checked": "2026-11-26, partly verified: confirm with WorldPop before redistributing derived rasters",
+      "citation": "WorldPop (www.worldpop.org). Global2 R2025A population estimates, 2020, 1 km, constrained, UN-adjusted. University of Southampton. Labelled alpha by the publisher.",
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84",
+      "reference_period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "status": "modelled",
+      "grade": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade_notes": "Release labelled alpha. Totals adjusted to UN WPP national estimates, so national totals are not independent of other sources. WorldPop asks that the data not be used to discriminate, exploit or surveil.",
+      "grade_weakest": "D"
+    },
+    "ghsl_smod_2020": {
+      "name": "GHS-SMOD R2023A, epoch 2020 (Degree of Urbanisation, level 2)",
+      "publisher": "European Commission, Joint Research Centre (GHSL)",
+      "url": "https://human-settlement.emergency.copernicus.eu/download.php?ds=smod",
+      "download": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_SMOD_GLOBE_R2023A/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss/V2-0/tiles/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss_V2_0_{tile}.zip",
+      "licence": "CC BY 4.0",
+      "licence_checked": "2026-11-26, copyright.txt in the download folder",
+      "citation": "Schiavina M., Melchiorri M., Pesaresi M. (2023): GHS-SMOD R2023A - GHS settlement layers, application of the Degree of Urbanisation methodology (stage I) to GHS-POP R2023A and GHS-BUILT-S R2023A, multitemporal (1975-2030). European Commission, Joint Research Centre. doi:10.2905/A0DF7A6F-49DE-46EA-9BDE-563437A6E2BA",
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84; JRC's resampling of the native 1 km Mollweide grid",
+      "reference_period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "status": "modelled",
+      "grade": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "D"
+      },
+      "grade_notes": "A classification derived from GHS-POP and GHS-BUILT-S, so it shares their modelling assumptions and is not independent of the population layer.",
+      "grade_weakest": "D"
+    },
+    "map_travel_2020": {
+      "name": "Malaria Atlas Project: travel time to healthcare, 2020 (motorised and walking-only)",
+      "publisher": "Malaria Atlas Project; Weiss et al. 2020",
+      "url": "https://malariaatlas.org/open-access-policy/",
+      "download": "https://data.malariaatlas.org/geoserver/Accessibility/ows?service=WCS&version=2.0.1&request=GetCoverage&coverageId=Accessibility__202001_Global_{variant}&subset=Lat({south},{north})&subset=Long({west},{east})&format=image/geotiff",
+      "licence": "CC BY 3.0 Unported",
+      "licence_checked": "2026-11-26, per WQL-001 section 4.6",
+      "citation": "Weiss D.J., Nelson A., Vargas-Ruiz C.A., et al. (2020). Global maps of travel time to healthcare facilities. Nature Medicine 26, 1835-1838. doi:10.1038/s41591-020-1059-1",
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84",
+      "reference_period": [
+        "2019-01-01",
+        "2020-12-31"
+      ],
+      "status": "modelled",
+      "grade": {
+        "recency": "C",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "B",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade_notes": "A least-cost model over a friction surface and a facility list. Facility coverage in the source list varies by country and is not quantified here. Travel time to the nearest facility says nothing about the facility's quality, staffing or cost.",
+      "grade_weakest": "D"
+    },
+    "ucdp_ged_261": {
+      "name": "UCDP Georeferenced Event Dataset (GED) Global version 26.1",
+      "publisher": "Uppsala Conflict Data Program, Uppsala University",
+      "url": "https://ucdp.uu.se/downloads/",
+      "download": "https://ucdp.uu.se/downloads/ged/ged261-csv.zip",
+      "licence": "CC BY 4.0",
+      "licence_checked": "2026-11-26, per WQL-001 section 4.6",
+      "citation": "Sundberg, Ralph, and Erik Melander, 2013, 'Introducing the UCDP Georeferenced Event Dataset', Journal of Peace Research 50(4): 523-532. Högbladh, Stina, 2026, 'UCDP GED Codebook version 26.1', Department of Peace and Conflict Research, Uppsala University.",
+      "native_grain": "Event points with a location precision code (1 exact, 2 within 25 km, 3 ADM2, 4 ADM1, 5 linear or fuzzy feature, 6 country, 7 international waters)",
+      "reference_period": [
+        "2021-01-01",
+        "2025-12-31"
+      ],
+      "status": "measured",
+      "grade": {
+        "recency": "A",
+        "directness": "B",
+        "spatial_fidelity": "B",
+        "coverage": "C",
+        "validation": "B",
+        "interval": "B"
+      },
+      "grade_notes": "Event-coded from news and NGO reporting, so it records reported organised violence with at least one death, not all violence. Coverage is weakest where reporting is weakest. Deaths carry low, best and high estimates.",
+      "grade_weakest": "C"
+    },
+    "unsd_census_dates": {
+      "name": "UNSD: 2020, 2010, 2000 and 1990 World Population and Housing Census Programme dates",
+      "publisher": "United Nations Statistics Division",
+      "url": "https://unstats.un.org/unsd/demographic-social/census/censusdates/",
+      "download": "https://unstats.un.org/unsd/demographic-social/census/censusdates/",
+      "licence": "UN web page; facts transcribed (dates are not copyrightable data, but the page carries no open licence)",
+      "licence_checked": "2026-11-26",
+      "citation": "United Nations Statistics Division, census dates by country, page updated 3 February 2026.",
+      "native_grain": "Country",
+      "reference_period": [
+        "1985-01-01",
+        "2026-11-26"
+      ],
+      "status": "measured",
+      "grade": {
+        "recency": "A",
+        "directness": "A",
+        "spatial_fidelity": "D",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "C"
+      },
+      "grade_notes": "A national fact spread over every cell in the country, so spatial fidelity is D by construction.",
+      "grade_weakest": "D"
+    },
+    "geoboundaries_adm0": {
+      "name": "geoBoundaries gbOpen ADM0 (simplified)",
+      "publisher": "geoBoundaries, William & Mary geoLab",
+      "url": "https://www.geoboundaries.org",
+      "download": "https://www.geoboundaries.org/api/current/gbOpen/{iso}/ADM0/",
+      "licence": "Set per country (see data/raw/geoboundaries/*-meta.json): UGA and COD ODbL 1.0; TZA and RWA CC BY 4.0; KEN and BDI public domain",
+      "licence_checked": "2026-11-26, geoBoundaries API metadata",
+      "citation": "Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866.",
+      "native_grain": "Vector polygons (simplified)",
+      "status": "measured"
+    }
+  },
+  "dimensions": [
+    "recency",
+    "directness",
+    "spatial_fidelity",
+    "coverage",
+    "validation",
+    "interval"
+  ]
+}

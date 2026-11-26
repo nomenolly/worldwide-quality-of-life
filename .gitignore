@@ -1,0 +1,7 @@
+# Raw downloads are large and re-fetchable; data/manifest.json records their hashes.
+data/raw/
+data/interim/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
