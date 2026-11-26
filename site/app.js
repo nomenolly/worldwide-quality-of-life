@@ -85,8 +85,12 @@
     s.colors.forEach((c, i) => parts.push(`<span><i class="sw" style="background:${c}"></i>${lab(i)}</span>`));
     parts.push(`<span><i class="sw absent"></i>absent</span>`);
     const note = m.scale.type === "log" ? "Classes are quantiles of the values in this window, so colours are relative to this region, not to any standard." :
-      m.scale.type === "diverging" ? "Brown: WorldPop lower than GHSL. Teal: WorldPop higher. Read the relative and absolute layers together." : "";
-    if (note) parts.push(`<span>${note}</span>`);
+      m.scale.type === "diverging" ? "Brown: WorldPop lower than GHSL. Teal: WorldPop higher." :
+      "Classes are equal steps for display only.";
+    parts.push(`<span>${note} No colour means better or worse.</span>`);
+    // Collapse audit: keep time and native grain visible at the point of reading ("Mosaic as moment", "Grid as ruler").
+    if (m.period) parts.push(`<span><strong>When:</strong> ${esc(m.period[0].slice(0, 4))}${m.period[1].slice(0, 4) !== m.period[0].slice(0, 4) ? "–" + esc(m.period[1].slice(0, 4)) : ""} (other layers describe other years)</span>`);
+    parts.push(`<span><strong>Measured on:</strong> ${esc(m.native_grain.split(";")[0])}; the hexagon is only an index</span>`);
     return parts.join("");
   }
 
@@ -146,6 +150,9 @@
       h += `<span class="badge">${esc(STATUS_TEXT[o.st] || o.st)}</span>`;
       h += `<span class="badge grade" title="Weakest of the six evidence dimensions. A flag, not a score.">weakest evidence: ${w}</span>`;
       h += `<dl class="kv"><dt>Native grain</dt><dd>${esc(m.native_grain)}</dd>`;
+      if (m.statistic) h += `<dt>Kind of number</dt><dd>${esc(m.statistic)}</dd>`;
+      h += `<dt>Steps from source</dt><dd>${m.lineage.length} (${o.st === "derived" ? "derived by this project" : "from the published " + esc(o.st) + " product"}; see how it was made)</dd>`;
+      if (m.depends_on) h += `<dt>Not independent of</dt><dd>${esc(m.depends_on)}</dd>`;
       if (o.n !== undefined) {
         const unit = m.id === "sec.conflict" ? (o.n === 1 ? "event" : "events") : (o.n === 1 ? "source pixel" : "source pixels");
         h += `<dt>Behind this value</dt><dd>${o.n.toLocaleString("en")} ${unit} in this cell</dd>`;
@@ -167,9 +174,10 @@
     const x = o.x || {};
     let h = "";
     if (m.id === "urb.share") h += `<dt>Split</dt><dd>urban centre ${fmt(x.urban_centre)}%, urban cluster ${fmt(x.urban_cluster)}%, rural ${fmt(x.rural)}%</dd>`;
-    if (m.id.startsWith("acc.")) h += `<dt>Within-cell spread</dt><dd>${fmt(x.min)} to ${fmt(x.max)} min (spread, not uncertainty); ${esc(x.weighting)}</dd>`;
-    if (m.id === "pop.disagreement_abs") h += `<dt>The two estimates</dt><dd>WorldPop ${fmt(x.worldpop)}, GHSL ${fmt(x.ghsl)} people</dd>`;
-    if (m.id === "pop.disagreement") h += `<dt>Absolute difference</dt><dd>${x.abs_diff > 0 ? "+" : ""}${fmt(x.abs_diff)} people (WorldPop minus GHSL)</dd><dt>The two estimates</dt><dd>WorldPop ${fmt(x.worldpop)}, GHSL ${fmt(x.ghsl)} people</dd>`;
+    if (m.id.startsWith("acc.")) h += `<dt>Within-cell spread</dt><dd>${fmt(x.min)} to ${fmt(x.max)} min (spread, not uncertainty); ${esc(x.weighting)}. The average is not any one person's journey.</dd>`;
+    if (m.id === "pop.difference_people") h += `<dt>The two estimates</dt><dd>WorldPop ${fmt(x.worldpop)}, GHSL ${fmt(x.ghsl)} people</dd>`;
+    if (m.id === "pop.disagreement_mag") h += `<dt>Signed D</dt><dd>${x.signed > 0 ? "+" : ""}${fmt(x.signed)}% (WorldPop ${x.signed > 0 ? "higher" : x.signed < 0 ? "lower" : "equal"})</dd><dt>The two estimates</dt><dd>WorldPop ${fmt(x.worldpop)}, GHSL ${fmt(x.ghsl)} people</dd>`;
+    if (m.id === "pop.disagreement") h += `<dt>Difference in people</dt><dd>${x.diff_people > 0 ? "+" : ""}${fmt(x.diff_people)} (WorldPop minus GHSL, signed)</dd><dt>The two estimates</dt><dd>WorldPop ${fmt(x.worldpop)}, GHSL ${fmt(x.ghsl)} people</dd>`;
     if (m.id === "sec.conflict" && x.events_within_25km) h += `<dt>Location precision</dt><dd>${x.events_within_25km} of ${o.n} events are located only within 25 km of the coded point, so they may belong to a neighbouring cell</dd>`;
     if (m.id === "kno.census_age" && x.countries) {
       h += `<dt>Census</dt><dd>${Object.entries(x.countries).map(([k, c]) => `${esc(k)}: ${c.lower_bound ? "no census since at least " + c.year + " (unconfirmed)" : "last census " + c.year}`).join("; ")}</dd>`;
@@ -183,12 +191,17 @@
     const f = c.f;
     let h = `<h2>Cell ${esc(cid)}</h2><div class="meta">Centre ${c.c[0]}°, ${c.c[1]}° · ${c.a} km² · H3 resolution ${REGION.h3_resolution} · <a href="#" id="closecell">back to overview</a></div>`;
     if (f.countries.length) h += `<div class="meta">Country outlines covering this cell: ${f.shares.map(([k, s]) => `${esc(k)} ${Math.round(s * 100)}%`).join(", ")}</div>`;
-    if (f.no_country) h += `<div class="flag">No country outline covers this cell. In the simplified geoBoundaries outlines that usually means open water, but some populated islands and shorelines also fall outside them.</div>`;
+    if (f.no_country) {
+      const ws = c.o["geo.water_share"], pg = c.o["pop.ghsl"];
+      h += `<div class="flag">No country outline in the simplified geoBoundaries files covers this cell. That is a fact about the boundary files only. ` +
+        `Separately observed here: ${ws && ws.st !== "absent" ? fmt(ws.v) + "% of the surface classed water (GHS-SMOD)" : "surface unknown"}; ` +
+        `${pg && pg.st !== "absent" ? fmt(pg.v) + " people modelled (GHSL)" : "population unknown"}.</div>`;
+    }
     if (f.boundary_disagreement) h += `<div class="flag">Boundary sources disagree here: two independently sourced country outlines overlap inside this cell. This is a disagreement between boundary files, not necessarily a political dispute.</div>`;
     if (f.known_dispute) h += `<div class="flag">Contested territory: ${esc(f.known_dispute)}. See the limits page; the list of disputes is not authoritative.</div>`;
     const ms = META.indicators.slice().sort((a, b) => (a.id === current ? -1 : b.id === current ? 1 : 0));
     h += ms.map((m) => obsCard(cid, m)).join("");
-    (REGION.withheld || []).forEach((w) => { h += `<div class="obs"><h3>${esc(w.label)}</h3><div class="val absent">Withheld from this preview</div><p class="meta">${esc(w.reason)}</p></div>`; });
+    (REGION.withheld || []).forEach((w) => { h += `<div class="obs"><h3>${esc(w.label)}</h3><div class="val absent">Withheld from this preview</div><p class="meta">${esc(w.reason)} Its absence here says nothing about whether this place is safe.</p></div>`; });
     $("#cell").innerHTML = h;
     $("#cell").hidden = false;
     $("#intro").hidden = true;

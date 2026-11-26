@@ -25,7 +25,7 @@
 <ul>
   <li><strong>Not a score or a ranking.</strong> Every layer is shown on its own. Nothing is added up, weighted or ranked, and colours are classes of the values in this window only.</li>
   <li><strong>Not a measurement at 36 km².</strong> The H3 resolution-6 hexagon is a common index for joining sources. Each value says what grid or points it came from and how many fell in the cell.</li>
-  <li><strong>Not a count of people.</strong> Both population layers are models that spread census totals over mapped buildings. They disagree with each other, and two layers show by how much: the relative difference (% of their mean) and the absolute difference (people). Read them together.</li>
+  <li><strong>Not a count of people.</strong> Both population layers are models that spread census totals over mapped buildings. They disagree with each other, and three layers show how: the signed relative difference D (% of their mean), its magnitude |D|, and the signed difference in people. They answer different questions; read them together.</li>
   <li><strong>No conflict data in this preview.</strong> Cell-level conflict records are withheld. At H3 resolution 6, 83 cells would show a single recorded event with its fatality estimate and range, which does not clear commitment C-11 (do no harm). A coarser conflict release will be reviewed separately.</li>
   <li><strong>Not a statement about facilities.</strong> Travel time to the nearest health facility says nothing about whether that facility has staff, medicine or fees people can pay.</li>
   <li><strong>Not a boundary authority.</strong> Country outlines come from geoBoundaries and are drawn for orientation. Where two outlines overlap the map says so. The short list of contested places is not drawn from a neutral register and is incomplete.</li>
@@ -34,7 +34,7 @@
 <h2>Known gaps in this version</h2>
 <ul>
   <li>Eastern DRC has had no census since at least 1984, so every population figure there rests on a far older anchor than its neighbours'. The census-age layer shows this directly.</li>
-  <li>Some Lake Victoria islands and shoreline settlements fall outside the simplified country outlines, so they have no country-level values even though people live there.</li>
+  <li>Some Lake Victoria islands and shoreline settlements fall outside the simplified country outlines, so they have no country-level values even though people live there. A cell outside every outline is not assumed to be water or empty: surface and population are shown as separate layers.</li>
   <li>Three of the eight core v0.1 layers are not here: night-light radiance (needs a login to the source), PM2.5 (download host not yet allowed in the build environment) and conflict deaths (withheld, above). The evidence-grading rules are still simplified.</li>
   <li>Population figures are for 2020, travel time for 2019 to 2020, and census dates as of 2026. They are not one moment in time.</li>
 </ul>

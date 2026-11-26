@@ -17,8 +17,10 @@ This repository holds **WQL-002**, the first construction milestone: an H3 resol
 |---|---|---|---|
 | `pop.ghsl` population (primary) | GHS-POP R2023A | 30 arc-second raster | 2020 |
 | `pop.worldpop` population (secondary) | WorldPop Global2 R2025A, constrained, UN-adjusted | 30 arc-second raster | 2020 |
-| `pop.disagreement` WorldPop vs GHSL, relative (%) | derived | 30 arc-second rasters | 2020 |
-| `pop.disagreement_abs` WorldPop vs GHSL, absolute (people) | derived | 30 arc-second rasters | 2020 |
+| `pop.disagreement` D = 100(W-G)/((W+G)/2), signed (%) | derived | 30 arc-second rasters | 2020 |
+| `pop.disagreement_mag` magnitude abs(D) (%) | derived | 30 arc-second rasters | 2020 |
+| `pop.difference_people` W - G, signed (people) | derived | 30 arc-second rasters | 2020 |
+| `geo.water_share` share of cell surface classed water | GHS-SMOD R2023A | 30 arc-second raster | 2020 |
 | `urb.share` urban population share | GHS-SMOD R2023A | 30 arc-second raster | 2020 |
 | `acc.motor`, `acc.walk` travel time to health care | Malaria Atlas Project | 30 arc-second raster | 2019–2020 |
 | `kno.census_age` years since census (boundary-derived package, ODbL) | UNSD census dates | country | as of 2026 |

@@ -2,6 +2,15 @@
 
 **Status:** built 2026-11-26; cleared Nolen's proof-of-concept review the same day. Prepared as the **Lake Victoria regional research preview**, on hold for release review. Not deployed: turning on GitHub Pages is Nolen's step. Reproducible with `make all`.
 
+## Collapse audit fixes (2026-11-26)
+
+Nolen's collapse audit scored two patterns as failures (2). Both are fixed at the data-generation level:
+
+* **Boundary as eraser.** The pipeline no longer explains a missing country outline as "open water". Jurisdictional coverage (boundary-derived package) and physical surface (`geo.water_share`, the share of the cell GHS-SMOD classes as water) are now independent observations. Every water statement is attributed to the source that made it.
+* **Gap as magnitude.** The signed disagreement D = 100 x (W - G) / ((W + G) / 2) is kept as `pop.disagreement`. Its magnitude abs(D) is a separate field and layer, `pop.disagreement_mag`, with the signed D shown beside it. The signed difference in people, previously labelled "absolute", is renamed `pop.difference_people` so that "absolute" no longer suggests "magnitude".
+
+Score-1 patterns improved cheaply: every legend now shows the layer's reference years and native grain, and says that no colour means better or worse (Mosaic as moment, Grid as ruler, Palette as norm). Every value shows what kind of number it is, how many steps it is from the source, and what it is not independent of (Mean as person, Echo as witness). The withheld conflict layer says its absence implies nothing about safety (Silence as peace).
+
 ## Changes for the research preview (release review, 2026-11-26)
 
 | Gate from the review | What changed |
@@ -40,12 +49,13 @@ WQL-002 moves the Worldwide Quality of Life Map from specification (WQL-001) to 
 |---|---|---|
 | Population, GHSL | 0 | GHSL covers every pixel, including water (as zero people). |
 | Population, WorldPop | 1,232 | The constrained product places people only where settlement is mapped. Lake cells and some rural cells are empty. |
-| Population disagreement, relative | 1,884 | 1,232 where WorldPop is empty; 652 where both models estimate fewer than 100 people, so a percentage would be noise. |
-| Population disagreement, absolute | 1,232 | WorldPop is empty. |
-| Urban population share | 1,392 | 1,195 are open water; 197 have no modelled residents, so a share is undefined. |
-| Travel time (both) | 0 | MAP models travel time everywhere, including across Lake Victoria. The 1,195 open-water cells carry a note that nobody lives there. |
+| Population disagreement D (signed) and its magnitude abs(D) | 1,884 each | 1,232 where WorldPop is empty; 652 where both models estimate fewer than 100 people, so a percentage would be noise. |
+| Population difference in people (signed) | 1,232 | WorldPop is empty. |
+| Water share of cell surface | 0 | Every cell has classified GHS-SMOD pixels. |
+| Urban population share | 1,392 | 1,195 cells are classed entirely water by GHS-SMOD with no modelled residents; 197 others have no modelled residents. Either way a share is undefined. |
+| Travel time (both) | 0 | MAP models travel time everywhere, including across Lake Victoria. Cells that GHS-SMOD classes entirely water and where GHS-POP models nobody carry a note saying so, attributed to those sources. |
 | Conflict deaths | withheld | Not published in the preview (C-11). |
-| Years since census | 1,193 | No country outline covers the cell. Mostly open water, but see the island finding below. |
+| Years since census | 1,193 | No country outline covers the cell. This is a fact about the boundary files only; the data never infers water or emptiness from it. Surface and population are separate layers (see the island finding below). |
 
 ### Findings that matter for the project
 
