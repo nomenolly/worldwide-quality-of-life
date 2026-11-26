@@ -23,3 +23,11 @@ membership = "cell centre inside window"
 [reference]
 # "Now" for recency calculations (years since census, age of data).
 as_of_year = 2026
+
+[release]
+# What this build is published as. The public preview withholds layers that
+# have not cleared review; withheld layers are not written to site/data or
+# data/processed at all.
+name = "Lake Victoria regional research preview"
+withheld = ["sec.conflict"]
+withheld_reason = "Cell-level conflict records are withheld from this preview: 83 cells would show a single recorded event with its fatality estimate and range, which does not clear commitment C-11 (do no harm). A coarser conflict release will be proposed for separate review."

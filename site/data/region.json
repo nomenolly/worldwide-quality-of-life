@@ -23,6 +23,7 @@
     "pop.ghsl": 0,
     "pop.worldpop": 1232,
     "pop.disagreement": 1884,
+    "pop.disagreement_abs": 1232,
     "urb.share": 1392,
     "acc.motor": 0,
     "acc.walk": 0,
@@ -93,14 +94,17 @@
       "note": "Last census 2022 (UNSD)."
     }
   },
-  "population_totals": {
-    "ghsl": 72385384,
-    "worldpop": 71263233
-  },
+  "release": "Lake Victoria regional research preview",
   "withheld": [
     {
       "id": "sec.conflict",
-      "note": "Removed from repository history on 2026-11-27 under C-11."
+      "label": "Deaths in organised violence (UCDP GED)",
+      "reason": "Cell-level conflict records are withheld from this preview: 83 cells would show a single recorded event with its fatality estimate and range, which does not clear commitment C-11 (do no harm). A coarser conflict release will be proposed for separate review.",
+      "single_event_cells": 83
     }
-  ]
+  ],
+  "population_totals": {
+    "ghsl": 72385384,
+    "worldpop": 71263233
+  }
 }

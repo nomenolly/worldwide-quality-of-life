@@ -56,7 +56,7 @@
     }
     let breaks, palette = SEQ, zeroClass = false;
     if (m.scale.type === "diverging") {
-      breaks = [-100, -50, -20, 0, 20, 50, 100];
+      breaks = m.scale.breaks;
       palette = DIV;
     } else if (m.scale.type === "linear" && m.scale.domain) {
       const [a, b] = m.scale.domain, step = (b - a) / SEQ.length;
@@ -85,7 +85,7 @@
     s.colors.forEach((c, i) => parts.push(`<span><i class="sw" style="background:${c}"></i>${lab(i)}</span>`));
     parts.push(`<span><i class="sw absent"></i>absent</span>`);
     const note = m.scale.type === "log" ? "Classes are quantiles of the values in this window, so colours are relative to this region, not to any standard." :
-      m.scale.type === "diverging" ? "Brown: WorldPop lower than GHSL. Teal: WorldPop higher." : "";
+      m.scale.type === "diverging" ? "Brown: WorldPop lower than GHSL. Teal: WorldPop higher. Read the relative and absolute layers together." : "";
     if (note) parts.push(`<span>${note}</span>`);
     return parts.join("");
   }
@@ -168,7 +168,8 @@
     let h = "";
     if (m.id === "urb.share") h += `<dt>Split</dt><dd>urban centre ${fmt(x.urban_centre)}%, urban cluster ${fmt(x.urban_cluster)}%, rural ${fmt(x.rural)}%</dd>`;
     if (m.id.startsWith("acc.")) h += `<dt>Within-cell spread</dt><dd>${fmt(x.min)} to ${fmt(x.max)} min (spread, not uncertainty); ${esc(x.weighting)}</dd>`;
-    if (m.id === "pop.disagreement") h += `<dt>The two estimates</dt><dd>WorldPop ${fmt(x.worldpop)}, GHSL ${fmt(x.ghsl)} people</dd>`;
+    if (m.id === "pop.disagreement_abs") h += `<dt>The two estimates</dt><dd>WorldPop ${fmt(x.worldpop)}, GHSL ${fmt(x.ghsl)} people</dd>`;
+    if (m.id === "pop.disagreement") h += `<dt>Absolute difference</dt><dd>${x.abs_diff > 0 ? "+" : ""}${fmt(x.abs_diff)} people (WorldPop minus GHSL)</dd><dt>The two estimates</dt><dd>WorldPop ${fmt(x.worldpop)}, GHSL ${fmt(x.ghsl)} people</dd>`;
     if (m.id === "sec.conflict" && x.events_within_25km) h += `<dt>Location precision</dt><dd>${x.events_within_25km} of ${o.n} events are located only within 25 km of the coded point, so they may belong to a neighbouring cell</dd>`;
     if (m.id === "kno.census_age" && x.countries) {
       h += `<dt>Census</dt><dd>${Object.entries(x.countries).map(([k, c]) => `${esc(k)}: ${c.lower_bound ? "no census since at least " + c.year + " (unconfirmed)" : "last census " + c.year}`).join("; ")}</dd>`;
@@ -187,6 +188,7 @@
     if (f.known_dispute) h += `<div class="flag">Contested territory: ${esc(f.known_dispute)}. See the limits page; the list of disputes is not authoritative.</div>`;
     const ms = META.indicators.slice().sort((a, b) => (a.id === current ? -1 : b.id === current ? 1 : 0));
     h += ms.map((m) => obsCard(cid, m)).join("");
+    (REGION.withheld || []).forEach((w) => { h += `<div class="obs"><h3>${esc(w.label)}</h3><div class="val absent">Withheld from this preview</div><p class="meta">${esc(w.reason)}</p></div>`; });
     $("#cell").innerHTML = h;
     $("#cell").hidden = false;
     $("#intro").hidden = true;
@@ -214,17 +216,28 @@
   // ------------------------------------------------------------ boot
   async function boot() {
     const get = (p) => fetch(p).then((r) => { if (!r.ok) throw new Error(p + " " + r.status); return r.json(); });
-    const [meta, obs, cells, bounds, region] = await Promise.all([
+    const [meta, obs, cells, bounds, region, bd] = await Promise.all([
       get("data/indicators.json"), get("data/observations.json"), get("data/cells.geojson"),
-      get("data/boundaries.geojson"), get("data/region.json")]);
+      get("data/boundary-derived/boundaries.geojson"), get("data/region.json"),
+      get("data/boundary-derived/cell-countries.json")]);
     META = meta; OBS = obs; REGION = region; SRC = meta.sources;
+    // Merge the ODbL boundary-derived package (country coverage, census age, recency override).
+    for (const id in OBS) {
+      const b = bd[id] || { countries: [], shares: [], no_country: true, o: {} };
+      OBS[id].f = b;
+      Object.assign(OBS[id].o, b.o || {});
+      if (b.pop_recency) for (const k of ["pop.ghsl", "pop.worldpop"]) {
+        const o = OBS[id].o[k];
+        if (o && o.st !== "absent") o.g = { ...(o.g || {}), recency: b.pop_recency };
+      }
+    }
 
     const r = region.region;
     map = L.map("map", { preferCanvas: false, zoomSnap: 0.25 }).fitBounds([[r.south, r.west], [r.north, r.east]]);
     baseLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 12, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' });
     baseLayer.addTo(map);
-    map.attributionControl.addAttribution("Data: GHSL (JRC), WorldPop, MAP, UCDP, UNSD, geoBoundaries. See each cell for licences.");
+    map.attributionControl.addAttribution('Data: GHSL (JRC), WorldPop, MAP, UNSD. Boundary-derived data <a href="data/boundary-derived/LICENSE.md">ODbL 1.0</a>, from geoBoundaries; Uganda and DRC outlines &copy; OpenStreetMap contributors. See each cell for licences.');
 
     cellLayer = L.geoJSON(cells, {
       style: () => ({ weight: 0.25 }),
@@ -249,6 +262,7 @@
     $("#summary").innerHTML = `This window holds <strong>${region.n_cells.toLocaleString("en")}</strong> cells and about ` +
       `<strong>${(region.population_totals.ghsl / 1e6).toFixed(1)} million</strong> people by GHSL's 2020 model ` +
       `(${(region.population_totals.worldpop / 1e6).toFixed(1)} million by WorldPop's). ` +
+      (region.withheld || []).map((w) => `<strong>Withheld from this preview:</strong> ${esc(w.label)}. ${esc(w.reason)} `).join("") +
       `Cells with no value: ${META.indicators.filter((m) => ac[m.id]).map((m) => `${esc(m.label)} ${ac[m.id].toLocaleString("en")}`).join("; ")}.`;
 
     const h = readHash();
