@@ -387,16 +387,20 @@ def main() -> int:
         g, w = obs[cid]["pop.ghsl"], obs[cid]["pop.worldpop"]
         if g["st"] == "absent" or w["st"] == "absent":
             absent(cid, "pop.disagreement", "One of the two population sources has no value here.")
-            absent(cid, "pop.disagreement_abs", "One of the two population sources has no value here.")
+            absent(cid, "pop.difference_people", "One of the two population sources has no value here.")
+            absent(cid, "pop.disagreement_mag", "One of the two population sources has no value here.")
             continue
         G, W = g["v"], w["v"]
-        obs[cid]["pop.disagreement_abs"] = {"v": round(W - G), "st": "derived", "x": {"ghsl": G, "worldpop": W}}
+        obs[cid]["pop.difference_people"] = {"v": round(W - G), "st": "derived", "x": {"ghsl": G, "worldpop": W}}
         if max(G, W) < MIN_PEOPLE:
             absent(cid, "pop.disagreement", f"Both sources estimate fewer than {MIN_PEOPLE} people; a percentage difference would mostly be noise.")
+            absent(cid, "pop.disagreement_mag", f"Both sources estimate fewer than {MIN_PEOPLE} people; a percentage difference would mostly be noise.")
             continue
         d = (W - G) / ((W + G) / 2) * 100
         obs[cid]["pop.disagreement"] = {"v": round(d, 1), "st": "derived",
-                                        "x": {"ghsl": G, "worldpop": W, "abs_diff": round(W - G)}}
+                                        "x": {"ghsl": G, "worldpop": W, "diff_people": round(W - G)}}
+        obs[cid]["pop.disagreement_mag"] = {"v": round(abs(d), 1), "st": "derived",
+                                            "x": {"signed": round(d, 1), "ghsl": G, "worldpop": W}}
 
     # ---- urbanisation: GHS-SMOD, population share by settlement class
     print("urbanisation: GHS-SMOD")
@@ -417,7 +421,7 @@ def main() -> int:
         tot = float(p.drop(labels=["water", "nodata"], errors="ignore").sum())
         if tot <= 0:
             if n_cls.get("water", 0) == len(part):
-                absent(cid, "urb.share", "Water: the settlement model classes every pixel here as water.")
+                absent(cid, "urb.share", "GHS-SMOD classes every pixel in this cell as water, and GHS-POP models no residents, so a population share is undefined.")
             else:
                 absent(cid, "urb.share", "No resident population, so a population share is undefined.")
             continue
@@ -426,6 +430,17 @@ def main() -> int:
                                  "st": "modelled", "n": int(len(part)), "x": shares}
     for cid in cells.index:
         obs[cid].setdefault("urb.share", {"st": "absent", "why": "No settlement-model pixels in this cell."})
+
+    # ---- physical surface: share of the cell GHS-SMOD classes as water. Recorded as its own
+    # observation so that physical geography is never inferred from jurisdictional coverage.
+    wcount = sdf[sdf.grp != "nodata"].groupby("cell_id").grp.agg(lambda g: (g == "water").sum())
+    wtotal = sdf[sdf.grp != "nodata"].groupby("cell_id").size()
+    for cid in cells.index:
+        if cid in wtotal.index and wtotal[cid] > 0:
+            obs[cid]["geo.water_share"] = {"v": round(float(wcount[cid]) / float(wtotal[cid]) * 100, 1),
+                                           "st": "modelled", "n": int(wtotal[cid])}
+        else:
+            absent(cid, "geo.water_share", "No settlement-model pixels with a class in this cell.")
 
     # ---- travel time to healthcare: population-weighted mean of pixels
     print("travel time: MAP")
@@ -447,8 +462,9 @@ def main() -> int:
                 v, how = float(np.average(vals.v, weights=w)), "population-weighted"
             else:
                 v, how = float(vals.v.mean()), "unweighted (no resident population)"
-            note = ({"note": "Open water: MAP models a travel time across the water surface; nobody lives here."}
-                    if obs[cid].get("urb.share", {}).get("why", "").startswith("Water") else {})
+            ws = obs[cid].get("geo.water_share", {}).get("v")
+            note = ({"note": "GHS-SMOD classes every pixel in this cell as water and GHS-POP models no residents. MAP still models a travel time across this surface."}
+                    if ws == 100 and w.sum() == 0 else {})
             obs[cid][key] = {"v": round(v, 1), "st": "modelled", "n": int(len(vals)),
                              "x": {"min": round(float(vals.v.min()), 1), "max": round(float(vals.v.max()), 1),
                                    "weighting": how, "pixels_missing": int(len(part) - len(vals)), **note}}
@@ -497,7 +513,7 @@ def main() -> int:
     for cid in cells.index:
         cs = ca.loc[cid, "countries"]
         if not cs:
-            absent(cid, "kno.census_age", "No country outline covers this cell (open water in the simplified outlines).")
+            absent(cid, "kno.census_age", "No country outline in the simplified geoBoundaries files covers this cell, so no national census can be attached. This is a fact about the boundary files only; it says nothing about whether the cell is land or water, or whether people live here (see the surface and population layers).")
             continue
         parts = {c: {"year": census[c]["year"], "age": as_of - census[c]["year"],
                      "lower_bound": census[c]["lower_bound"]} for c in cs}
@@ -531,25 +547,41 @@ def main() -> int:
              pixel_lineage + ["Sum pixel populations per cell"],
              "Constrained product: people are placed only where settlement is mapped, so many rural cells are empty here but not in GHSL. National totals are adjusted to UN estimates.",
              {"type": "log", "palette": "seq"}),
-        meta("pop.disagreement", "Population disagreement, relative (WorldPop vs GHSL)", "Knowledge: data quality", "% of mean",
+        meta("pop.disagreement", "Population disagreement D, signed (WorldPop vs GHSL)", "Knowledge: data quality", "% of mean",
              "worldpop_2020",
-             ["Take pop.ghsl and pop.worldpop for the cell",
+             ["Take pop.ghsl (G) and pop.worldpop (W) for the cell",
               f"Skip cells where both are below {MIN_PEOPLE} people",
-              "Relative difference = (WorldPop - GHSL) / mean(WorldPop, GHSL) x 100",
-              "Absolute difference = WorldPop - GHSL, in people"],
-             "A measure of how far two reputable models disagree, not of which is right. Two measures are shown together: the relative difference (mapped, % of the mean of the two) and the absolute difference in people (in the inspector and downloads). Positive means WorldPop places more people here than GHSL.",
+              "D = 100 x (W - G) / ((W + G) / 2)"],
+             "Signed: positive means WorldPop places more people here than GHSL, negative fewer. It shows how far two reputable models disagree, not which is right. Its magnitude |D| and the difference in people are separate layers with different meanings.",
              {"type": "diverging", "palette": "div", "breaks": [-100, -50, -20, 0, 20, 50, 100]},
              grade={"recency": "B", "directness": "C", "spatial_fidelity": "A", "coverage": "B",
                     "validation": "C", "interval": "D"}, status="derived",
-             extra={"sources": ["ghsl_pop_2020", "worldpop_2020"]}),
-        meta("pop.disagreement_abs", "Population disagreement, absolute (WorldPop minus GHSL)", "Knowledge: data quality",
+             extra={"sources": ["ghsl_pop_2020", "worldpop_2020"], "statistic": "signed relative difference",
+                     "depends_on": "GHSL and WorldPop share census inputs and building data, so agreement between them is not independent confirmation"}),
+        meta("pop.disagreement_mag", "Population disagreement magnitude |D|", "Knowledge: data quality", "% of mean",
+             "worldpop_2020",
+             ["Take D from pop.disagreement", "|D| = absolute value of D (the sign is dropped)"],
+             "How large the disagreement is, whatever its direction. A different analytical object from D: it cannot say which model is higher. The inspector shows the signed D beside it.",
+             {"type": "linear", "palette": "seq", "domain": [0, 200]},
+             grade={"recency": "B", "directness": "C", "spatial_fidelity": "A", "coverage": "B",
+                    "validation": "C", "interval": "D"}, status="derived",
+             extra={"sources": ["ghsl_pop_2020", "worldpop_2020"], "statistic": "magnitude of the relative difference",
+                     "depends_on": "GHSL and WorldPop share census inputs and building data, so agreement between them is not independent confirmation"}),
+        meta("pop.difference_people", "Population difference in people, signed (WorldPop minus GHSL)", "Knowledge: data quality",
              "people", "worldpop_2020",
-             ["Take pop.ghsl and pop.worldpop for the cell", "Absolute difference = WorldPop - GHSL, in people"],
-             "The companion to the relative disagreement layer. Large absolute gaps sit in dense places even when the relative gap is small; large relative gaps can sit in places with few people. Read the two together. Positive means WorldPop places more people here than GHSL.",
+             ["Take pop.ghsl (G) and pop.worldpop (W) for the cell", "Difference = W - G, in people (signed)"],
+             "Signed difference in people. Large differences in people sit in dense places even when D is small; large D can sit where few people live. Read it beside D.",
              {"type": "diverging", "palette": "div", "breaks": [-5000, -1000, -200, 0, 200, 1000, 5000]},
              grade={"recency": "B", "directness": "C", "spatial_fidelity": "A", "coverage": "B",
                     "validation": "C", "interval": "D"}, status="derived",
-             extra={"sources": ["ghsl_pop_2020", "worldpop_2020"]}),
+             extra={"sources": ["ghsl_pop_2020", "worldpop_2020"], "statistic": "signed difference in people",
+                     "depends_on": "GHSL and WorldPop share census inputs and building data, so agreement between them is not independent confirmation"}),
+        meta("geo.water_share", "Water share of cell surface (GHS-SMOD)", "Context: physical surface", "% of classified pixels",
+             "ghsl_smod_2020",
+             pixel_lineage + ["Share of pixels in the cell classed 10 (water) by GHS-SMOD"],
+             "Physical surface, recorded independently of country outlines and of population. A cell can be water and inside a country, or land and outside every outline.",
+             {"type": "linear", "palette": "seq", "domain": [0, 100]},
+             extra={"statistic": "share of pixels"}),
         meta("urb.share", "Urban population share (GHS-SMOD)", "Context: settlement", "% of cell population",
              "ghsl_smod_2020",
              pixel_lineage + ["Weight each pixel by its GHS-POP 2020 population (same grid)",
@@ -589,6 +621,21 @@ def main() -> int:
              "A national fact spread over every cell, so it is the same for a capital and a remote valley. It matters because every population model above is anchored to these censuses.",
              {"type": "linear", "palette": "seq", "domain": [0, 45]}),
     ]
+    # What kind of number each value is, and what it is not independent of
+    # (collapse audit: "Mean as person", "Echo as witness").
+    STAT = {"pop.ghsl": "sum of modelled pixel estimates", "pop.worldpop": "sum of modelled pixel estimates",
+            "urb.share": "population-weighted share", "acc.motor": "population-weighted mean over the cell",
+            "acc.walk": "population-weighted mean over the cell", "kno.census_age": "national value attached to the cell"}
+    DEP = {"pop.ghsl": "Shares census inputs with WorldPop, so the two are not independent",
+           "pop.worldpop": "Shares census inputs with GHSL, and national totals are adjusted to UN estimates",
+           "urb.share": "Derived from GHS-POP and built-up surface, so it is not independent of the GHSL population layer",
+           "geo.water_share": "Same GHSL production chain as GHS-POP and GHS-SMOD",
+           "acc.motor": "Weighted by GHS-POP", "acc.walk": "Weighted by GHS-POP"}
+    for m in indicators:
+        m.setdefault("statistic", STAT.get(m["id"], ""))
+        if m["id"] in DEP:
+            m.setdefault("depends_on", DEP[m["id"]])
+
     # Withheld layers leave no trace in any output (C-11). Only an aggregate count of
     # single-event cells is kept, to document why.
     withheld_info = []
@@ -626,7 +673,7 @@ def main() -> int:
                             weakest(gd) if o["st"] != "absent" else "",
                             json.dumps(gd, separators=(",", ":")) if o["st"] != "absent" else "",
                             m["source_id"], pw, o.get("n", ""),
-                            o.get("why", "") or (f"absolute difference {o['x']['abs_diff']} people" if ind == "pop.disagreement" else "")])
+                            o.get("why", "") or (f"signed difference in people (WorldPop minus GHSL): {o['x']['diff_people']}" if ind == "pop.disagreement" else "")])
     # Lineage is per indicator, so it is written once rather than on 75,000 rows.
     with open(PROCESSED / "indicators.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
