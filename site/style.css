@@ -17,8 +17,10 @@ a { color: var(--accent); }
 .bar { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; justify-content: space-between;
   padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
 .bar .sub { color: var(--muted); margin-left: 8px; }
+.bar .tagline { margin: 4px 0 0; color: var(--muted); font-size: 13px; max-width: 900px; }
 .bar nav a { margin-left: 16px; }
-main { display: grid; grid-template-columns: 1fr 420px; height: calc(100% - 52px); min-height: 0; }
+body { display: flex; flex-direction: column; }
+main { display: grid; grid-template-columns: 1fr 420px; flex: 1; min-height: 0; }
 #mapwrap { position: relative; display: flex; flex-direction: column; min-height: 0; }
 #controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 8px 16px;
   border-bottom: 1px solid var(--line); background: var(--panel); }
@@ -55,7 +57,8 @@ path.cell-absent { fill: url(#hatch); }
 #hatch line { stroke: var(--absent-line); stroke-width: 2; }
 .leaflet-container { font: inherit; }
 @media (max-width: 860px) {
-  main { grid-template-columns: 1fr; grid-template-rows: 60vh auto; height: auto; }
+  main { grid-template-columns: 1fr; grid-template-rows: auto auto; height: auto; }
+  #map { min-height: 60vh; }
   #inspector { border-left: 0; border-top: 1px solid var(--line); }
   .bar nav a { margin: 0 12px 0 0; }
   #controls select { width: 100%; }

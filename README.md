@@ -1,5 +1,7 @@
 # Worldwide Quality of Life Map
 
+The Worldwide Quality of Life Map brings population, health access, and other observations onto a common geographic grid, starting around Lake Victoria, so anyone can see what’s known about a place, where estimates disagree, and where evidence is missing.
+
 A geographically continuous, epistemically accountable map of human conditions. Geography is the substrate (H3 cells); jurisdictions are overlays. Every observation keeps its provenance, native resolution, uncertainty and evidence grade. Missing data is shown as missing. There are no composite scores and no rankings.
 
 This repository holds **WQL-002**, the first construction milestone: an H3 resolution-6 substrate and the **Lake Victoria regional research preview** (2°S to 3°N, 30°E to 36°E). The foundational specification is WQL-001.
