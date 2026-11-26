@@ -1,0 +1,106 @@
+{
+  "region": {
+    "id": "great-lakes-victoria",
+    "name": "African Great Lakes: Lake Victoria window",
+    "south": -2.0,
+    "north": 3.0,
+    "west": 30.0,
+    "east": 36.0,
+    "countries": [
+      "UGA",
+      "KEN",
+      "TZA",
+      "RWA",
+      "BDI",
+      "COD"
+    ]
+  },
+  "h3_resolution": 6,
+  "as_of_year": 2026,
+  "n_cells": 9369,
+  "mean_cell_area_km2": 39.57,
+  "absent_counts": {
+    "pop.ghsl": 0,
+    "pop.worldpop": 1232,
+    "pop.disagreement": 1884,
+    "urb.share": 1392,
+    "acc.motor": 0,
+    "acc.walk": 0,
+    "kno.census_age": 1193
+  },
+  "boundary": {
+    "cells_where_outlines_overlap": 32,
+    "cells_in_no_outline": 1193,
+    "border_cells": 211,
+    "known_disputes": [
+      {
+        "name": "Migingo Island",
+        "claimants": [
+          "KEN",
+          "UGA"
+        ],
+        "lat": -0.883,
+        "lng": 33.95,
+        "note": "Small island in Lake Victoria claimed by Kenya and Uganda. Point location approximate."
+      }
+    ],
+    "registered_not_placed": [
+      {
+        "name": "Rukwanzi Island (Lake Albert)",
+        "claimants": [
+          "COD",
+          "UGA"
+        ],
+        "note": "Reported DRC-Uganda dispute. Location not yet verified, so it is not placed on the map."
+      }
+    ]
+  },
+  "census": {
+    "BDI": {
+      "year": 2024,
+      "lower_bound": false,
+      "text": "16-30 August 1990 | | - | | | 16-31 August 2008 | | | 15 August 2024 | | (...)",
+      "note": "Last census 2024 (UNSD)."
+    },
+    "COD": {
+      "year": 1984,
+      "lower_bound": true,
+      "text": "- | | - | | - | | - | | (2026)",
+      "note": "No census in the 1990, 2000, 2010 or 2020 rounds on the UNSD page. 1984 is reported elsewhere and is not yet confirmed, so the age is a lower bound."
+    },
+    "KEN": {
+      "year": 2019,
+      "lower_bound": false,
+      "text": "24 August 1989 | | | 24 August 1999 | | | | 24-31 August 2009 | | | 24 August 2019 | | (24 August 2029)",
+      "note": "Last census 2019 (UNSD)."
+    },
+    "RWA": {
+      "year": 2022,
+      "lower_bound": false,
+      "text": "15 August 1991 | | | 16-30 August 2002 | | | | 16-30 August 2012 | | | 16 August 2022 | | (15 August 2032)",
+      "note": "Last census 2022 (UNSD)."
+    },
+    "UGA": {
+      "year": 2024,
+      "lower_bound": false,
+      "text": "12-19 January 1991 | | | 12 September 2002 | | | | 27 Aug.-6 Sep. 2014 | | | 10 May 2024 | | (...)",
+      "note": "Last census 2024 (UNSD)."
+    },
+    "TZA": {
+      "year": 2022,
+      "lower_bound": false,
+      "text": "28 August 1988 | | | 24-25 August 2002 | | | | 26 August 2012 | | | | 23 August 2022 | | | (23 August 2032)",
+      "note": "Last census 2022 (UNSD)."
+    }
+  },
+  "population_totals": {
+    "ghsl": 72385384,
+    "worldpop": 71263233
+  },
+  "withheld": [
+    {
+      "id": "sec.conflict",
+      "note": "Removed from repository history on 2026-11-27 under C-11."
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limits of this map</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { overflow: auto; }
+  article { max-width: 760px; margin: 0 auto; padding: 16px 16px 60px; }
+  article h1 { font-size: 22px; } article h2 { font-size: 16px; margin-top: 28px; }
+  article li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="title"><strong>Worldwide Quality of Life Map</strong><span class="sub">Limits of this map (commitment C-13)</span></div>
+  <nav><a href="index.html">Back to the map</a></nav>
+</header>
+<article>
+<h1>What this map can and cannot tell you</h1>
+<p>This is a proof of concept for one window around Lake Victoria (2°S to 3°N, 30°E to 36°E), built in WQL-002. It shows a few openly licensed observations on a common hexagonal grid. It is not a measure of quality of life, and it does not say where life is better or worse.</p>
+
+<h2>What it is not</h2>
+<ul>
+  <li><strong>Not a score or a ranking.</strong> Every layer is shown on its own. Nothing is added up, weighted or ranked, and colours are classes of the values in this window only.</li>
+  <li><strong>Not a measurement at 36 km².</strong> The H3 resolution-6 hexagon is a common index for joining sources. Each value says what grid or points it came from and how many fell in the cell.</li>
+  <li><strong>Not a count of people.</strong> Both population layers are models that spread census totals over mapped buildings. They disagree with each other, and the disagreement layer shows by how much.</li>
+  <li><strong>Not a record of all violence.</strong> UCDP records reported organised violence with deaths. A cell with zero means nothing was recorded there, which is not the same as nothing happening. Reporting is thinnest where access is hardest.</li>
+  <li><strong>Not a statement about facilities.</strong> Travel time to the nearest health facility says nothing about whether that facility has staff, medicine or fees people can pay.</li>
+  <li><strong>Not a boundary authority.</strong> Country outlines come from geoBoundaries and are drawn for orientation. Where two outlines overlap the map says so. The short list of contested places is not drawn from a neutral register and is incomplete.</li>
+</ul>
+
+<h2>Known gaps in this version</h2>
+<ul>
+  <li>Eastern DRC has had no census since at least 1984, so every population figure there rests on a far older anchor than its neighbours'. The census-age layer shows this directly.</li>
+  <li>Some Lake Victoria islands and shoreline settlements fall outside the simplified country outlines, so they have no country-level values even though people live there.</li>
+  <li>Three of the eight core v0.1 layers are not here yet: night-light radiance (needs a login to the source), PM2.5 (download host not yet allowed in the build environment) and a full evidence-grading rule set.</li>
+  <li>Population figures are for 2020, travel time for 2019 to 2020, conflict for 2021 to 2025, and census dates as of 2026. They are not one moment in time.</li>
+</ul>
+
+<h2>How to read the evidence flag</h2>
+<p>Every value carries six evidence grades from A to D: recency, directness, spatial fidelity, coverage, validation and interval. The badge shows the weakest of the six, as a warning, not as a quality score. Open "Evidence grade by dimension" on any value to see all six, and which were lowered for that particular cell.</p>
+
+<h2>Missing means missing</h2>
+<p>Hatched cells have no value for the layer shown. The map never fills a gap with a guess, and the inspector says why each gap exists.</p>
+
+<h2>Corrections</h2>
+<p>If something here is wrong about a place you know, please open an issue at <a href="https://github.com/nomenolly/worldwide-quality-of-life/issues">github.com/nomenolly/worldwide-quality-of-life/issues</a>. A fuller channel for affected people to challenge observations (C-14) is planned but not built.</p>
+
+<h2>Sources and licences</h2>
+<p>GHS-POP and GHS-SMOD R2023A (European Commission JRC, CC BY 4.0); WorldPop Global2 R2025A (CC BY 4.0, partly verified); Malaria Atlas Project travel time to healthcare 2020 (CC BY 3.0); UCDP GED 26.1 (CC BY 4.0); UNSD census dates; geoBoundaries ADM0 (licence per country: Uganda and DRC ODbL 1.0, Tanzania and Rwanda CC BY 4.0, Kenya and Burundi public domain); basemap © OpenStreetMap contributors. Full citations are in each cell's "Caveat and source" panel and in the repository.</p>
+</article>
+</body>
+</html>

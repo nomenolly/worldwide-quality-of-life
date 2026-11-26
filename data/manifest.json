@@ -1,0 +1,156 @@
+{
+  "geoboundaries/BDI-ADM0-meta.json": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/api/current/gbOpen/BDI/ADM0/",
+    "bytes": 2042,
+    "sha256": "8866e628efbb36b3cd6ddce786c3c6081330c335146f39448150421dfa372978",
+    "retrieved": "2026-11-26T19:21:57+00:00"
+  },
+  "geoboundaries/BDI-ADM0.geojson": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/data/snapshots/1c423398df24ddf6e730b116567d2181c9782778d0459c3f3b76ca2f9f12b6bc/gbOpen/BDI/ADM0/geoBoundaries-BDI-ADM0_simplified.geojson",
+    "bytes": 28712,
+    "sha256": "3ae449d463e4015118afa27dd701f62dcca3919b2f6a948c7582db8ca98032ac",
+    "retrieved": "2026-11-26T19:21:58+00:00"
+  },
+  "geoboundaries/COD-ADM0-meta.json": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/api/current/gbOpen/COD/ADM0/",
+    "bytes": 2104,
+    "sha256": "07f98c37823fd2087d9331b6544af0dbb2f20368c8f23eb9369346df79760616",
+    "retrieved": "2026-11-26T19:21:58+00:00"
+  },
+  "geoboundaries/COD-ADM0.geojson": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/data/snapshots/1c423398df24ddf6e730b116567d2181c9782778d0459c3f3b76ca2f9f12b6bc/gbOpen/COD/ADM0/geoBoundaries-COD-ADM0_simplified.geojson",
+    "bytes": 338909,
+    "sha256": "0235b375979cd9095c601abdff90e10ac868ba88c8ff8a50c1bcfa2739632cf6",
+    "retrieved": "2026-11-26T19:21:59+00:00"
+  },
+  "geoboundaries/KEN-ADM0-meta.json": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/api/current/gbOpen/KEN/ADM0/",
+    "bytes": 2102,
+    "sha256": "5c72dc34f55f879b475d7dd906576589c1fbb2983631780df82c318c914c1f16",
+    "retrieved": "2026-11-26T19:21:53+00:00"
+  },
+  "geoboundaries/KEN-ADM0.geojson": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/data/snapshots/1c423398df24ddf6e730b116567d2181c9782778d0459c3f3b76ca2f9f12b6bc/gbOpen/KEN/ADM0/geoBoundaries-KEN-ADM0_simplified.geojson",
+    "bytes": 183357,
+    "sha256": "1b89c125de8af50a11c776fa895fa246e635959f121fc9568f029fadb2789885",
+    "retrieved": "2026-11-26T19:21:54+00:00"
+  },
+  "geoboundaries/RWA-ADM0-meta.json": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/api/current/gbOpen/RWA/ADM0/",
+    "bytes": 2121,
+    "sha256": "a87b8f3f3ea255718b5cded7e034999eeb912ef2f36a7f6ef6f7d470043a1ebc",
+    "retrieved": "2026-11-26T19:21:56+00:00"
+  },
+  "geoboundaries/RWA-ADM0.geojson": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/data/snapshots/1c423398df24ddf6e730b116567d2181c9782778d0459c3f3b76ca2f9f12b6bc/gbOpen/RWA/ADM0/geoBoundaries-RWA-ADM0_simplified.geojson",
+    "bytes": 297325,
+    "sha256": "84838fd37d002c5a83fa1b72fdf7da0090826f50c37c08b687319f05cfa757f3",
+    "retrieved": "2026-11-26T19:21:57+00:00"
+  },
+  "geoboundaries/TZA-ADM0-meta.json": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/api/current/gbOpen/TZA/ADM0/",
+    "bytes": 2125,
+    "sha256": "ed935d404750ab28005484b03cfa10f64061f7d059c04d8d4284b0c00e66b5df",
+    "retrieved": "2026-11-26T19:21:54+00:00"
+  },
+  "geoboundaries/TZA-ADM0.geojson": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/data/snapshots/1c423398df24ddf6e730b116567d2181c9782778d0459c3f3b76ca2f9f12b6bc/gbOpen/TZA/ADM0/geoBoundaries-TZA-ADM0_simplified.geojson",
+    "bytes": 1057758,
+    "sha256": "1747ee40292473b7b892acf27f67718c93e3d07507cb5d4f3e3a320748c7ceea",
+    "retrieved": "2026-11-26T19:21:55+00:00"
+  },
+  "geoboundaries/UGA-ADM0-meta.json": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/api/current/gbOpen/UGA/ADM0/",
+    "bytes": 2053,
+    "sha256": "4810ffad4a52352abf5a41e28cb78bf0eeaefbd92bf30bbe4b6c0b552163f0ae",
+    "retrieved": "2026-11-26T19:21:51+00:00"
+  },
+  "geoboundaries/UGA-ADM0.geojson": {
+    "source_id": "geoboundaries_adm0",
+    "url": "https://www.geoboundaries.org/data/snapshots/1c423398df24ddf6e730b116567d2181c9782778d0459c3f3b76ca2f9f12b6bc/gbOpen/UGA/ADM0/geoBoundaries-UGA-ADM0_simplified.geojson",
+    "bytes": 256893,
+    "sha256": "522d165c1e27f930a2390c1f14124890f4b67c75c67298f2a5dd04208279e586",
+    "retrieved": "2026-11-26T19:21:52+00:00"
+  },
+  "ghsl/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0_R10_C22.zip": {
+    "source_id": "ghsl_pop_2020",
+    "url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_4326_30ss/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0_R10_C22.zip",
+    "bytes": 7237243,
+    "sha256": "37fdc3211f34143670eabb54fb7c39e72635920d32a4eb74e2429a398195dcb4",
+    "retrieved": "2026-11-26T19:19:24+00:00"
+  },
+  "ghsl/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0_R9_C22.zip": {
+    "source_id": "ghsl_pop_2020",
+    "url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_4326_30ss/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0_R9_C22.zip",
+    "bytes": 6516877,
+    "sha256": "e4495948681c0efc9326024039a91ca48eb91ca9d3e9321d129d4139b9aefd64",
+    "retrieved": "2026-11-26T19:19:21+00:00"
+  },
+  "ghsl_smod/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss_V2_0_R10_C22.zip": {
+    "source_id": "ghsl_smod_2020",
+    "url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_SMOD_GLOBE_R2023A/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss/V2-0/tiles/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss_V2_0_R10_C22.zip",
+    "bytes": 1591727,
+    "sha256": "d643dab3739222cb18a3a3ce4a5f4c9c342798b36042762ab24923a38682197a",
+    "retrieved": "2026-11-26T19:19:27+00:00"
+  },
+  "ghsl_smod/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss_V2_0_R9_C22.zip": {
+    "source_id": "ghsl_smod_2020",
+    "url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_SMOD_GLOBE_R2023A/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss/V2-0/tiles/GHS_SMOD_E2020_GLOBE_R2023A_4326_30ss_V2_0_R9_C22.zip",
+    "bytes": 1603164,
+    "sha256": "4c19f66ec0ea0c09063a599ec8800b9635efd10504d75b850a569ec946ed614c",
+    "retrieved": "2026-11-26T19:19:25+00:00"
+  },
+  "map/Motorized_Travel_Time_to_Healthcare.tif": {
+    "source_id": "map_travel_2020",
+    "url": "https://data.malariaatlas.org/geoserver/Accessibility/ows?service=WCS&version=2.0.1&request=GetCoverage&coverageId=Accessibility__202001_Global_Motorized_Travel_Time_to_Healthcare&subset=Lat(-2.5,3.5)&subset=Long(29.5,36.5)&format=image/geotiff",
+    "bytes": 4194740,
+    "sha256": "6a0b0a32331119f39b836ab68baac49aff3138a965ea144eb1e5c75a55aebe3d",
+    "retrieved": "2026-11-26T19:21:38+00:00"
+  },
+  "map/Walking_Only_Travel_Time_To_Healthcare.tif": {
+    "source_id": "map_travel_2020",
+    "url": "https://data.malariaatlas.org/geoserver/Accessibility/ows?service=WCS&version=2.0.1&request=GetCoverage&coverageId=Accessibility__202001_Global_Walking_Only_Travel_Time_To_Healthcare&subset=Lat(-2.5,3.5)&subset=Long(29.5,36.5)&format=image/geotiff",
+    "bytes": 4194740,
+    "sha256": "e8ba45e341374840a46f4c5fcd7ae8e0c0eeebfb70bac2ca59ded04d9a2cfc12",
+    "retrieved": "2026-11-26T19:21:41+00:00"
+  },
+  "ucdp/ged261-csv.zip": {
+    "source_id": "ucdp_ged_261",
+    "url": "https://ucdp.uu.se/downloads/ged/ged261-csv.zip",
+    "bytes": 39122522,
+    "sha256": "8c941d84954e555ee2e54f40fa04d9203bf1e2f962203d0a9930966c4947c667",
+    "retrieved": "2026-11-26T19:21:47+00:00"
+  },
+  "ucdp/ged261.pdf": {
+    "source_id": "ucdp_ged_261",
+    "url": "https://ucdp.uu.se/downloads/ged/ged261.pdf",
+    "bytes": 917038,
+    "sha256": "f767380ebbf365aec7586f98b6d100cafb69fb54010a908604d53bd9ad655972",
+    "retrieved": "2026-11-26T19:21:50+00:00"
+  },
+  "unsd/censusdates.html": {
+    "source_id": "unsd_census_dates",
+    "url": "https://unstats.un.org/unsd/demographic-social/census/censusdates/",
+    "bytes": 255139,
+    "sha256": "787386e1257c7967e137338807403b7276c75ac5ec131e8a0f7f051b1b69ba16",
+    "retrieved": "2026-11-26T19:21:51+00:00"
+  },
+  "worldpop/global_pop_2020_CN_1km_R2025A_UA_v1.tif": {
+    "source_id": "worldpop_2020",
+    "url": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/0_Mosaicked/v1/1km_ua/constrained/global_pop_2020_CN_1km_R2025A_UA_v1.tif",
+    "bytes": 289035870,
+    "sha256": "9ee4a4a82efa30ad7a9aff90808f89f708ae96a8769f2c7ac77750bc21b969ae",
+    "retrieved": "2026-11-26T19:21:35+00:00"
+  }
+}

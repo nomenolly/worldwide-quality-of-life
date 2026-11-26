@@ -1,0 +1,6 @@
+h3==4.5.1
+numpy>=2.0
+pandas>=2.2
+rasterio==1.5.2
+requests>=2.31
+shapely>=2.0

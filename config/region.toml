@@ -1,0 +1,25 @@
+# WQL-002 test region. Changing these values and re-running `make all`
+# rebuilds the substrate and every layer for a different window.
+
+[region]
+id = "great-lakes-victoria"
+name = "African Great Lakes: Lake Victoria window"
+# Window agreed in WQL-002: 2°S to 3°N, 30°E to 36°E.
+south = -2.0
+north = 3.0
+west = 30.0
+east = 36.0
+# Countries whose outlines are fetched for the overlay (ISO 3166-1 alpha-3).
+countries = ["UGA", "KEN", "TZA", "RWA", "BDI", "COD"]
+
+[substrate]
+# H3 resolution 6 (average 36.13 km²). This is a common index for joining
+# observations, not a claim of observational precision. Each observation keeps
+# its native grain, which the map shows beside the value.
+h3_resolution = 6
+# A cell belongs to the window when its centre falls inside the box.
+membership = "cell centre inside window"
+
+[reference]
+# "Now" for recency calculations (years since census, age of data).
+as_of_year = 2026
