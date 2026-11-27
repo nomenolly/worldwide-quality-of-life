@@ -12,7 +12,15 @@ This repository holds **WQL-002**, the first construction milestone: an H3 resol
 * **Limits statement shown on the map:** [`site/limits.html`](site/limits.html)
 * **Data licences:** [`DATA_LICENSES.md`](DATA_LICENSES.md); boundary-derived data is ODbL 1.0, see [`site/data/boundary-derived/`](site/data/boundary-derived/)
 
-## Layers in this version
+## WQL-003: global reference preview (in progress, not published)
+
+The whole globe on H3 resolution 5, with Nolen's four controls (locality, indicator, observation date, evidence) and a locality inspector: select any place on Earth and it returns what is known there and what is not, and why. Two of the twelve reference indicators are on the map (population density from GHSL and WorldPop, travel time to health care from MAP); the other ten are registered with their blockers in [`config/indicators.toml`](config/indicators.toml).
+
+* **The map:** [`site/global/`](site/global/) (`make serve`, then http://localhost:8000/global/). Excluded from the Pages workflow until its release is approved.
+* **Report, proposed decisions and collapse-audit self-check:** [`docs/WQL-003-report.md`](docs/WQL-003-report.md)
+* **Build:** `make global` (about 5.5 GB of downloads, then about 4 minutes); `make locate LL="-1.29 36.82"` asks the build about any place; `make renew` checks sources for upstream changes.
+
+## Layers in the Lake Victoria regional preview (WQL-002)
 
 | Indicator | Source | Native grain | Period |
 |---|---|---|---|

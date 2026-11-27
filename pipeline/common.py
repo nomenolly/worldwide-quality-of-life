@@ -23,6 +23,11 @@ def load_sources() -> dict:
         return tomllib.load(f)
 
 
+def load_indicators() -> dict:
+    with open(ROOT / "config" / "indicators.toml", "rb") as f:
+        return tomllib.load(f)
+
+
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:

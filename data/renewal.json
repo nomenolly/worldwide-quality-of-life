@@ -1,0 +1,48 @@
+{
+  "checked": "2026-11-27T17:13:06+00:00",
+  "current_build": "2026-11-27+c35810488fdb",
+  "sources": [
+    {
+      "source_id": "ghsl_land_2018",
+      "name": "GHS-LAND R2022A, epoch 2018, 1 km (land surface grid)",
+      "kind": "listing",
+      "changed": false,
+      "findings": [
+        "Download was recorded without server headers; recording today's as the baseline: Last-Modified Thu, 23 Jun 2022 21:13:18 GMT, ETag \"a78e7f6-5e223ec375733\", Content-Length 175695862.",
+        "No release newer than GHS_LAND_GLOBE_R2022A listed."
+      ],
+      "cadence_months": 36
+    },
+    {
+      "source_id": "ghsl_pop_2020_global",
+      "name": "GHS-POP R2023A, epoch 2020, global 30 arc-second mosaic",
+      "kind": "listing",
+      "changed": false,
+      "findings": [
+        "Download was recorded without server headers; recording today's as the baseline: Last-Modified Tue, 24 Sep 2024 12:24:42 GMT, ETag \"1cc01b08-622dc970c539a\", Content-Length 482351880.",
+        "No release newer than GHS_POP_GLOBE_R2023A listed.",
+        "Related products also listed (whether any supersedes the ingested one is not checked): GHS_POP_ARCTIC_R2025A, GHS_POP_GLOBE_R2022A, GHS_WUP_POP_GLOBE_R2025A."
+      ],
+      "cadence_months": 24
+    },
+    {
+      "source_id": "map_travel_2020_global",
+      "name": "Malaria Atlas Project: travel time to healthcare, 2020, motorised (global surface via WCS)",
+      "kind": "wcs_capabilities",
+      "changed": false,
+      "findings": [
+        "No release newer than Accessibility__202001_Global_Motorized_Travel_Time_to_Healthcare listed."
+      ],
+      "cadence_months": 60
+    },
+    {
+      "source_id": "worldpop_2020_global",
+      "name": "WorldPop Global2 R2025A, 2020, constrained, UN-adjusted, 1 km",
+      "kind": "head",
+      "changed": false,
+      "findings": [
+        "Download was recorded without server headers; recording today's as the baseline: Last-Modified Sun, 17 Aug 2025 21:52:12 GMT, ETag \"113a565e-63c96a2a9344b\", Content-Length 289035870."
+      ]
+    }
+  ]
+}
