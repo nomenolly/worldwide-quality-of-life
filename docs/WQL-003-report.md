@@ -65,12 +65,12 @@ New dependencies: `h3ronpy` (vectorised H3 assignment, about 3 million pixels a 
 
 ## Proposed decisions (for Nolen to ratify or change)
 
-* **D-24.** The global build reports at H3 resolution 5 in the inspector and draws resolutions 2 to 4 when zoomed out; regional builds keep resolution 6. Reason: a resolution-6 global build would be about 4 million cells and roughly 200 MB of published files. Reading native pixels directly (cloud-optimised GeoTIFFs) is the way to go finer, later.
-* **D-25.** GHS-LAND is the physical-surface observation for the global build, so that water is never inferred from a zero population or from a missing boundary. The global build uses no country outlines at all.
-* **D-26.** Global colour classes are fixed per indicator, not quantiles, and the legend says they are for display only.
-* **D-27.** A cell that no source touches is not drawn. Selecting it states exactly what that means, and the legend shows it.
-* **D-28.** Population density is per km² of the whole cell, water included. The inspector shows the land share and the count beside it.
-* **D-29.** Generated global data is committed to the repository for now. Before publication, consider publishing build outputs as release assets instead, so that renewal does not grow the repository by about 14 MB a build.
+* **D-27.** The global build reports at H3 resolution 5 in the inspector and draws resolutions 2 to 4 when zoomed out; regional builds keep resolution 6. Reason: a resolution-6 global build would be about 4 million cells and roughly 200 MB of published files. Reading native pixels directly (cloud-optimised GeoTIFFs) is the way to go finer, later.
+* **D-28.** GHS-LAND is the physical-surface observation for the global build, so that water is never inferred from a zero population or from a missing boundary. The global build uses no country outlines at all.
+* **D-29.** Global colour classes are fixed per indicator, not quantiles, and the legend says they are for display only.
+* **D-30.** A cell that no source touches is not drawn. Selecting it states exactly what that means, and the legend shows it.
+* **D-31.** Population density is per km² of the whole cell, water included. The inspector shows the land share and the count beside it.
+* **D-32.** Generated global data is committed to the repository for now. Before publication, consider publishing build outputs as release assets instead, so that renewal does not grow the repository by about 14 MB a build.
 
 ## Collapse audit, self-check
 
