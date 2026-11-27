@@ -20,7 +20,7 @@ Score-1 patterns improved cheaply: every legend now shows the layer's reference 
 | Conflict layer and C-11 | Cell-level conflict records are withheld from the map and from every published file (`[release] withheld` in `config/region.toml`). The build confirms the review's count: 83 cells hold a single recorded event. A coarser release will be proposed separately. |
 | Title and disagreement | Retitled "Lake Victoria regional research preview". Population disagreement is now two map layers, relative (% of the mean) and absolute (people), and the inspector shows both with the two estimates. |
 
-Known issue: the first commit on `main` (9bf0353) still contains the cell-level conflict data in git history. Removing it from history means rewriting `main`, which needs Nolen's decision.
+Repository history: rewritten on 2026-11-27 at Nolen's direction so that no commit contains conflict records. The original history is kept only in a restricted archive outside the public repository. See `docs/RELEASE_GATES.md`.
 
 WQL-002 moves the Worldwide Quality of Life Map from specification (WQL-001) to construction. This report covers what was built against the acceptance criteria, and gives a full account of missing data, uncertainty and what failed.
 

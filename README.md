@@ -8,6 +8,7 @@ This repository holds **WQL-002**, the first construction milestone: an H3 resol
 
 * **The map:** `site/` (static; published by GitHub Pages once enabled)
 * **What is missing and what failed:** [`docs/WQL-002-report.md`](docs/WQL-002-report.md)
+* **Release gates (ratified 2026-11-27):** [`docs/RELEASE_GATES.md`](docs/RELEASE_GATES.md); run `python3 pipeline/check_release.py` before any release
 * **Limits statement shown on the map:** [`site/limits.html`](site/limits.html)
 * **Data licences:** [`DATA_LICENSES.md`](DATA_LICENSES.md); boundary-derived data is ODbL 1.0, see [`site/data/boundary-derived/`](site/data/boundary-derived/)
 
