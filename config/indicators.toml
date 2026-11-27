@@ -1,0 +1,243 @@
+# WQL-003 global indicator registry.
+#
+# Two kinds of entry:
+#
+#   [[reference]]  one of the twelve global reference indicators Nolen listed on
+#                  2026-11-27, with what it reveals and its interpretation limit,
+#                  in Nolen's words. Each says whether it is ingested, and if not,
+#                  why not. The locality inspector lists every one of them for
+#                  every place, so what is not known is shown beside what is.
+#
+#   [[layer]]      a layer the global build actually computes. `ingest` names the
+#                  aggregation rule that pipeline/ingest.py applies to the source
+#                  raster. Adding an indicator means adding a source to
+#                  sources.toml and a [[layer]] here; no new code unless it needs a
+#                  new aggregation rule.
+#
+# Status words for references:
+#   ingested     on the map now
+#   next         open source identified and reachable; not yet ingested
+#   blocked      open source identified but the build cannot reach it yet
+#   prospective  only non-commercially licensed sources known so far; registered,
+#                not ingested, under proposed D-13 (openly licensed data only for v0.1)
+#
+# Licence statements marked "to verify" have not been checked against the
+# publisher's own terms in this session.
+
+[build]
+name = "Global reference preview (WQL-003)"
+# H3 resolutions. Inspection: the resolution at which the locality inspector
+# reports values. Display: coarser resolutions used for the zoomed-out heatmap.
+# These are indexes for joining and drawing, not claims of observational precision.
+inspect_res = 5
+display_res = [2, 3, 4]
+# Shards: inspection cells are written in one file per parent cell at this resolution.
+shard_res = 1
+display_shard_res = { "2" = -1, "3" = -1, "4" = 0 }   # -1 = one global file
+as_of = "2026-11-27"
+context_sources = []
+
+# ---------------------------------------------------------------- reference indicators
+
+[[reference]]
+id = "population_density"
+label = "Population density"
+reveals = "Human settlement"
+limitation = "Not prosperity"
+status = "ingested"
+layers = ["pop.ghsl", "pop.worldpop", "pop.disagreement"]
+
+[[reference]]
+id = "night_lights"
+label = "Night-light intensity"
+reveals = "Illuminated infrastructure and activity"
+limitation = "Not wealth directly"
+status = "blocked"
+candidate = "Earth Observation Group, VIIRS Nighttime Lights annual composites (VNL v2), CC BY 4.0"
+reason = "The publisher requires an account login to download, which the automated build cannot do yet. NASA Black Marble (VNP46A4) is an alternative but also needs an Earthdata token."
+needs = "An EOG or Earthdata account token stored as a build secret, or a manual download placed in data/raw."
+
+[[reference]]
+id = "healthcare_access"
+label = "Healthcare accessibility"
+reveals = "Geographic access to care"
+limitation = "Not quality of care"
+status = "ingested"
+layers = ["acc.motor"]
+
+[[reference]]
+id = "pm25"
+label = "PM2.5 exposure"
+reveals = "Atmospheric pollution"
+limitation = "Modelled exposure"
+status = "blocked"
+candidate = "Atmospheric Composition Analysis Group (Washington University), satellite-derived PM2.5 V6.GL; licence to verify"
+reason = "The download host is not on the build environment's network allowlist (found in WQL-002), and the licence terms are not yet confirmed."
+needs = "Allow the ACAG host in the cloud environment, or download on Nolen's Mac, and confirm the licence."
+
+[[reference]]
+id = "extreme_heat"
+label = "Extreme heat"
+reveals = "Thermal exposure"
+limitation = "Not individual vulnerability"
+status = "blocked"
+candidate = "ERA5 / ERA5-Land reanalysis (Copernicus Climate Data Store), CC BY 4.0 (to verify)"
+reason = "The Climate Data Store requires a registered account and API key. Which heat measure to publish (for example days above a temperature threshold, or wet-bulb temperature) is a design choice that has not been made."
+needs = "A CDS API key as a build secret, and Nolen's choice of heat measure."
+
+[[reference]]
+id = "child_mortality"
+label = "Child mortality"
+reveals = "Realized biological welfare"
+limitation = "Uneven spatial coverage"
+status = "prospective"
+candidate = "IHME under-5 mortality estimates for low- and middle-income countries, 5 km (Burstein et al. 2019); IHME's free non-commercial user agreement (to verify)"
+reason = "The only gridded source known so far is licensed for non-commercial use only. Under proposed D-13 it is registered, not ingested. Coverage is low- and middle-income countries only, so most of the globe would be absent by design, not unobserved."
+needs = "Nolen's ruling on D-13, or an openly licensed gridded source."
+
+[[reference]]
+id = "electricity_access"
+label = "Electricity access"
+reveals = "Material infrastructure"
+limitation = "Not reliability"
+status = "next"
+candidate = "Falchetta et al. (2019), gridded electricity access estimates from night lights and population, Scientific Data; licence to verify"
+reason = "Not yet ingested. The best-known gridded estimates are derived from night lights and population, so they would not be independent of either layer."
+needs = "Licence check, then a [[layer]] entry."
+
+[[reference]]
+id = "drinking_water"
+label = "Drinking water access"
+reveals = "Basic resource security"
+limitation = "Often coarse resolution"
+status = "prospective"
+candidate = "IHME WaSH access estimates for low- and middle-income countries, 5 km; IHME non-commercial terms (to verify). WHO/UNICEF JMP publishes national figures only."
+reason = "Only non-commercially licensed gridded estimates are known so far; the openly published JMP figures are national, which would spread one number over a whole country."
+needs = "Nolen's ruling on D-13, or acceptance of national JMP values with spatial fidelity D."
+
+[[reference]]
+id = "education"
+label = "Educational attainment"
+reveals = "Realized educational opportunity"
+limitation = "Not educational quality"
+status = "prospective"
+candidate = "IHME educational attainment estimates for low- and middle-income countries, 5 km; IHME non-commercial terms (to verify)"
+reason = "Only non-commercially licensed gridded estimates are known so far."
+needs = "Nolen's ruling on D-13, or an openly licensed source."
+
+[[reference]]
+id = "vegetation"
+label = "Vegetation coverage"
+reveals = "Local ecological conditions"
+limitation = "Not ecological integrity"
+status = "next"
+candidate = "ESA WorldCover 2021 (10 m land cover, tree and grass classes), CC BY 4.0"
+reason = "Not yet ingested. At 10 m the source is about 2,600 tiles, so it needs a streaming aggregation step rather than a whole-file read."
+needs = "A tiled ingestion rule (share of pixels in a class), then a [[layer]] entry."
+
+[[reference]]
+id = "internet"
+label = "Internet accessibility"
+reveals = "Digital connectivity"
+limitation = "Not digital literacy"
+status = "prospective"
+candidate = "Ookla Open Data speed tests by tile, CC BY-NC-SA 4.0"
+reason = "Licensed for non-commercial use only. Speed tests also record where tests were run, not where people lack access."
+needs = "Nolen's ruling on D-13, or an openly licensed source."
+
+[[reference]]
+id = "census_recency"
+label = "Census recency"
+reveals = "Observational currency"
+limitation = "Not statistical accuracy"
+status = "next"
+candidate = "UN Statistics Division census dates (already transcribed for six countries in WQL-002) with a global boundary overlay"
+reason = "Built for the Lake Victoria window only. Going global needs census dates for every country and a global boundary layer; geoBoundaries' global composite mixes licences, including ODbL share-alike."
+needs = "A transcription of the UNSD dates for all countries and a decision on the boundary source."
+
+# ---------------------------------------------------------------- ingested layers
+
+[[layer]]
+id = "pop.ghsl"
+reference = "population_density"
+label = "Population density (GHSL 2020)"
+short = "GHSL population"
+source_id = "ghsl_pop_2020_global"
+ingest = "sum"
+# GHSL writes 0 on unpopulated land and on open water alike: only positive pixels
+# are summed, and the land layer says whether a zero is land.
+positive_only = true
+unit = "people per km² of cell"
+count_unit = "people"
+period = "2020"
+upstream_epochs = "GHSL publishes this model every five years from 1975 to 2030 (2025 and 2030 are projections); other epochs are not yet ingested."
+statistic = "sum of modelled pixel estimates, divided by the cell's area"
+depends_on = "Shares census inputs with WorldPop, so the two are not independent"
+caveat = "Modelled residential population for 2020, not a count. Density is people per km² of the whole cell, water included, so coastal and lake cells read lower than their land does. A zero is GHSL's modelled zero: it is written on open water and on unpopulated land alike."
+scale = { type = "log", breaks = [1, 5, 25, 100, 250, 1000, 5000] }
+primary = true
+
+[[layer]]
+id = "pop.worldpop"
+reference = "population_density"
+label = "Population density (WorldPop 2020, constrained)"
+short = "WorldPop population"
+source_id = "worldpop_2020_global"
+ingest = "sum"
+count_valid = true
+unit = "people per km² of cell"
+count_unit = "people"
+period = "2020"
+upstream_epochs = "WorldPop Global2 publishes yearly estimates from 2015 to 2030 (years after the release are projections); other years are not yet ingested."
+statistic = "sum of modelled pixel estimates, divided by the cell's area"
+depends_on = "Shares census inputs with GHSL, and national totals are adjusted to UN estimates"
+caveat = "Constrained product: people are placed only where settlement is mapped. Where the raster has no value, WorldPop makes no estimate; that is not a zero."
+scale = { type = "log", breaks = [1, 5, 25, 100, 250, 1000, 5000] }
+
+[[layer]]
+id = "pop.disagreement"
+reference = "population_density"
+label = "Population disagreement D, signed (WorldPop vs GHSL)"
+short = "Population disagreement D"
+derived = "disagreement"
+inputs = ["pop.ghsl", "pop.worldpop"]
+min_people = 100
+unit = "% of the two estimates' mean"
+period = "2020"
+statistic = "signed relative difference, D = 100 x (W - G) / ((W + G) / 2)"
+depends_on = "GHSL and WorldPop share census inputs and building data, so agreement between them is not independent confirmation"
+caveat = "How far two reputable models disagree, not which is right, and not an error bar. Positive means WorldPop places more people here than GHSL. Cells where both estimate fewer than 100 people have no value, because a percentage would mostly be noise."
+scale = { type = "diverging", breaks = [-100, -50, -20, 0, 20, 50, 100] }
+status = "derived"
+grade = { recency = "B", directness = "C", spatial_fidelity = "A", coverage = "B", validation = "C", interval = "D" }
+
+[[layer]]
+id = "acc.motor"
+reference = "healthcare_access"
+label = "Travel time to nearest health facility, motorised (MAP 2020)"
+short = "Travel time to care (motorised)"
+source_id = "map_travel_2020_global"
+ingest = "weighted_mean"
+weight = "pop.ghsl"
+unit = "minutes"
+period = "2019–2020"
+statistic = "population-weighted mean over the cell (unweighted where GHSL models no residents)"
+depends_on = "Weighted by GHSL population"
+caveat = "Modelled best-case travel time assuming motorised transport is available. Says nothing about facility quality, staffing, cost or opening hours. The average is no one's actual journey: the inspector shows the fastest and slowest pixel in the cell, which is spread, not uncertainty."
+scale = { type = "log", breaks = [5, 15, 30, 60, 120, 240, 480] }
+
+[[layer]]
+id = "geo.land"
+reference = ""
+label = "Land share of cell surface (GHS-LAND 2018)"
+short = "Land share"
+source_id = "ghsl_land_2018"
+ingest = "area_share"
+projected = true
+unit = "% of cell area"
+period = "2018"
+statistic = "square metres of land from 1 km pixels whose centres fall in the cell, over the cell's area"
+depends_on = "Same GHSL production family as GHS-POP"
+caveat = "Physical surface, recorded on its own so that water is never inferred from a zero population or a missing boundary. Pixel-centre assignment of 1 km Mollweide pixels can push a coastal cell's share a few points either way, and slightly above 100%."
+scale = { type = "linear", breaks = [10, 25, 50, 75, 90, 99] }
+context = true

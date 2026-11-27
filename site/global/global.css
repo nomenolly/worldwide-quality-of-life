@@ -1,0 +1,23 @@
+#controls.four { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 14px; align-items: start; }
+#controls.four .ctl { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+#controls.four label { font-weight: 600; font-size: 13px; }
+#controls.four select, #controls.four input { font: inherit; padding: 3px 6px; width: 100%; min-width: 0; }
+#controls.four form { display: flex; gap: 4px; }
+#controls.four form button { font: inherit; padding: 3px 10px; }
+#controls.four #legend { grid-column: 1 / -1; }
+.hint { color: var(--muted); font-weight: 400; font-size: 12px; }
+#zoomnote { position: absolute; left: 10px; bottom: 22px; z-index: 500; background: var(--panel); padding: 3px 8px;
+  border: 1px solid var(--line); border-radius: 4px; pointer-events: none; max-width: calc(100% - 20px); }
+#legend .sw.untouched { background: transparent; border: 1px dashed var(--absent-line); }
+.obs.notknown { background: var(--bg); }
+.obs .lim { font-size: 12px; color: var(--muted); margin: 2px 0 6px; }
+.obs .lim strong { color: var(--fg); font-weight: 600; }
+.status { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 10px; margin-right: 4px;
+  background: var(--absent-bg); border: 1px solid var(--absent-line); color: var(--fg); }
+.section-h { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 18px 0 4px; }
+.loc-h code { font-size: 12px; }
+.err { color: #b3261e; }
+#aboutbox ul { padding-left: 18px; }
+#aboutbox li { margin: 3px 0; }
+@media (max-width: 1100px) { #controls.four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { #controls.four { grid-template-columns: 1fr; } }

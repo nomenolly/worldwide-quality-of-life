@@ -1,0 +1,987 @@
+{
+  "build": {
+    "name": "Global reference preview (WQL-003)",
+    "version": "2026-11-27+c35810488fdb",
+    "built": "2026-11-27T17:14:38+00:00",
+    "as_of": "2026-11-27",
+    "inspect_res": 5,
+    "display_res": [
+      2,
+      3,
+      4
+    ],
+    "shard_res": 1
+  },
+  "layers": [
+    {
+      "id": "pop.ghsl",
+      "reference": "population_density",
+      "label": "Population density (GHSL 2020)",
+      "short": "GHSL population",
+      "unit": "people per km² of cell",
+      "period": "2020",
+      "statistic": "sum of modelled pixel estimates, divided by the cell's area",
+      "depends_on": "Shares census inputs with WorldPop, so the two are not independent",
+      "caveat": "Modelled residential population for 2020, not a count. Density is people per km² of the whole cell, water included, so coastal and lake cells read lower than their land does. A zero is GHSL's modelled zero: it is written on open water and on unpopulated land alike.",
+      "scale": {
+        "type": "log",
+        "breaks": [
+          1,
+          5,
+          25,
+          100,
+          250,
+          1000,
+          5000
+        ]
+      },
+      "upstream_epochs": "GHSL publishes this model every five years from 1975 to 2030 (2025 and 2030 are projections); other epochs are not yet ingested.",
+      "status": "modelled",
+      "grade_detail": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "D"
+      },
+      "grade": "D",
+      "lineage": [
+        "Download GHS-POP R2023A, epoch 2020, global 30 arc-second mosaic (30 arc-second raster (about 0.93 km at the equator, narrower towards the poles), WGS84; JRC's own resampling of the 100 m / 1 km Mollweide product)",
+        "Read the raster in strips of 1,200 rows",
+        "Assign each pixel to the H3 resolution-5 cell containing its centre",
+        "Sum the pixels with a modelled population above zero",
+        "Divide by the cell's area for density; the inspector also shows the count",
+        "Coarser display cells add up the components of their children, then apply the same formula"
+      ],
+      "primary": true,
+      "context": false,
+      "source_id": "ghsl_pop_2020_global",
+      "native_grain": "30 arc-second raster (about 0.93 km at the equator, narrower towards the poles), WGS84; JRC's own resampling of the 100 m / 1 km Mollweide product",
+      "reference_period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "grade_notes": "Modelled from census counts disaggregated onto built-up surface. No per-pixel interval is published. GHSL writes 0 both on unpopulated land and on open water, so a zero here does not say whether the place is land (see the land-surface layer). Recency is not yet lowered per country for old censuses in the global build: that needs the census-recency layer, which is registered but not yet ingested globally.",
+      "count_unit": "people"
+    },
+    {
+      "id": "pop.worldpop",
+      "reference": "population_density",
+      "label": "Population density (WorldPop 2020, constrained)",
+      "short": "WorldPop population",
+      "unit": "people per km² of cell",
+      "period": "2020",
+      "statistic": "sum of modelled pixel estimates, divided by the cell's area",
+      "depends_on": "Shares census inputs with GHSL, and national totals are adjusted to UN estimates",
+      "caveat": "Constrained product: people are placed only where settlement is mapped. Where the raster has no value, WorldPop makes no estimate; that is not a zero.",
+      "scale": {
+        "type": "log",
+        "breaks": [
+          1,
+          5,
+          25,
+          100,
+          250,
+          1000,
+          5000
+        ]
+      },
+      "upstream_epochs": "WorldPop Global2 publishes yearly estimates from 2015 to 2030 (years after the release are projections); other years are not yet ingested.",
+      "status": "modelled",
+      "grade_detail": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade": "D",
+      "lineage": [
+        "Download WorldPop Global2 R2025A, 2020, constrained, UN-adjusted, 1 km (30 arc-second raster (about 0.93 km), WGS84, 60°S to 84°N)",
+        "Read the raster in strips of 1,200 rows",
+        "Assign each pixel to the H3 resolution-5 cell containing its centre",
+        "Sum every pixel with a value, and count them",
+        "Divide by the cell's area for density; the inspector also shows the count",
+        "Coarser display cells add up the components of their children, then apply the same formula"
+      ],
+      "primary": false,
+      "context": false,
+      "source_id": "worldpop_2020_global",
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84, 60°S to 84°N",
+      "reference_period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "grade_notes": "Release labelled alpha. Constrained: people are placed only where settlement is mapped, and elsewhere the raster has no value (not zero). Totals adjusted to UN WPP national estimates. Covers 60°S to 84°N only. WorldPop asks that the data not be used to discriminate, exploit or surveil.",
+      "count_unit": "people"
+    },
+    {
+      "id": "pop.disagreement",
+      "reference": "population_density",
+      "label": "Population disagreement D, signed (WorldPop vs GHSL)",
+      "short": "Population disagreement D",
+      "unit": "% of the two estimates' mean",
+      "period": "2020",
+      "statistic": "signed relative difference, D = 100 x (W - G) / ((W + G) / 2)",
+      "depends_on": "GHSL and WorldPop share census inputs and building data, so agreement between them is not independent confirmation",
+      "caveat": "How far two reputable models disagree, not which is right, and not an error bar. Positive means WorldPop places more people here than GHSL. Cells where both estimate fewer than 100 people have no value, because a percentage would mostly be noise.",
+      "scale": {
+        "type": "diverging",
+        "breaks": [
+          -100,
+          -50,
+          -20,
+          0,
+          20,
+          50,
+          100
+        ]
+      },
+      "status": "derived",
+      "grade_detail": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "B",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade": "D",
+      "lineage": [
+        "Take the GHSL (G) and WorldPop (W) population counts for the cell",
+        "Leave cells where both are below 100 people without a value",
+        "D = 100 x (W - G) / ((W + G) / 2)"
+      ],
+      "primary": false,
+      "context": false,
+      "sources": [
+        "ghsl_pop_2020_global",
+        "worldpop_2020_global"
+      ],
+      "native_grain": "Derived per cell from the two population layers",
+      "reference_period": [
+        "2020-01-01",
+        "2020-12-31"
+      ]
+    },
+    {
+      "id": "acc.motor",
+      "reference": "healthcare_access",
+      "label": "Travel time to nearest health facility, motorised (MAP 2020)",
+      "short": "Travel time to care (motorised)",
+      "unit": "minutes",
+      "period": "2019–2020",
+      "statistic": "population-weighted mean over the cell (unweighted where GHSL models no residents)",
+      "depends_on": "Weighted by GHSL population",
+      "caveat": "Modelled best-case travel time assuming motorised transport is available. Says nothing about facility quality, staffing, cost or opening hours. The average is no one's actual journey: the inspector shows the fastest and slowest pixel in the cell, which is spread, not uncertainty.",
+      "scale": {
+        "type": "log",
+        "breaks": [
+          5,
+          15,
+          30,
+          60,
+          120,
+          240,
+          480
+        ]
+      },
+      "status": "modelled",
+      "grade_detail": {
+        "recency": "C",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "B",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade": "D",
+      "lineage": [
+        "Download Malaria Atlas Project: travel time to healthcare, 2020, motorised (global surface via WCS) (30 arc-second raster (about 0.93 km), WGS84, 60°S to 85°N)",
+        "Read the raster in strips of 1,200 rows",
+        "Assign each pixel to the H3 resolution-5 cell containing its centre",
+        "Weight each pixel by the GHSL population at its centre (nearest GHSL pixel)",
+        "Population-weighted mean per cell; the unweighted mean where GHSL models nobody",
+        "Keep the fastest and slowest pixel in the cell as spread",
+        "Coarser display cells add up the components of their children, then apply the same formula"
+      ],
+      "primary": false,
+      "context": false,
+      "source_id": "map_travel_2020_global",
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84, 60°S to 85°N",
+      "reference_period": [
+        "2019-01-01",
+        "2020-12-31"
+      ],
+      "grade_notes": "A least-cost model over a friction surface and a facility list compiled around 2019. Facility coverage in the source list varies by country and is not quantified here. Travel time to the nearest facility says nothing about the facility's quality, staffing or cost. No value over open water or outside 60°S to 85°N."
+    },
+    {
+      "id": "geo.land",
+      "reference": "",
+      "label": "Land share of cell surface (GHS-LAND 2018)",
+      "short": "Land share",
+      "unit": "% of cell area",
+      "period": "2018",
+      "statistic": "square metres of land from 1 km pixels whose centres fall in the cell, over the cell's area",
+      "depends_on": "Same GHSL production family as GHS-POP",
+      "caveat": "Physical surface, recorded on its own so that water is never inferred from a zero population or a missing boundary. Pixel-centre assignment of 1 km Mollweide pixels can push a coastal cell's share a few points either way, and slightly above 100%.",
+      "scale": {
+        "type": "linear",
+        "breaks": [
+          10,
+          25,
+          50,
+          75,
+          90,
+          99
+        ]
+      },
+      "status": "modelled",
+      "grade_detail": {
+        "recency": "B",
+        "directness": "B",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "D"
+      },
+      "grade": "D",
+      "lineage": [
+        "Download GHS-LAND R2022A, epoch 2018, 1 km (land surface grid) (1 km raster in World Mollweide (EPSG:54009); each pixel holds square metres of land)",
+        "Read the raster in strips of 1,200 rows, reprojecting pixel centres to WGS84",
+        "Assign each pixel to the H3 resolution-5 cell containing its centre",
+        "Sum square metres of land and divide by the cell's area",
+        "Coarser display cells add up the components of their children, then apply the same formula"
+      ],
+      "primary": false,
+      "context": true,
+      "source_id": "ghsl_land_2018",
+      "native_grain": "1 km raster in World Mollweide (EPSG:54009); each pixel holds square metres of land",
+      "reference_period": [
+        "2018-01-01",
+        "2018-12-31"
+      ],
+      "grade_notes": "Land surface estimated jointly from a 2018 Sentinel-2 composite, 2014 Landsat panchromatic data and OpenStreetMap (GHSL Data Package 2022, section 2.5). Pixels with no value (mostly open sea) are read by this build as holding no land. From the same GHSL production family as GHS-POP, so not an independent check on it."
+    }
+  ],
+  "references": [
+    {
+      "id": "population_density",
+      "label": "Population density",
+      "reveals": "Human settlement",
+      "limitation": "Not prosperity",
+      "status": "ingested",
+      "layers": [
+        "pop.ghsl",
+        "pop.worldpop",
+        "pop.disagreement"
+      ]
+    },
+    {
+      "id": "night_lights",
+      "label": "Night-light intensity",
+      "reveals": "Illuminated infrastructure and activity",
+      "limitation": "Not wealth directly",
+      "status": "blocked",
+      "candidate": "Earth Observation Group, VIIRS Nighttime Lights annual composites (VNL v2), CC BY 4.0",
+      "reason": "The publisher requires an account login to download, which the automated build cannot do yet. NASA Black Marble (VNP46A4) is an alternative but also needs an Earthdata token.",
+      "needs": "An EOG or Earthdata account token stored as a build secret, or a manual download placed in data/raw."
+    },
+    {
+      "id": "healthcare_access",
+      "label": "Healthcare accessibility",
+      "reveals": "Geographic access to care",
+      "limitation": "Not quality of care",
+      "status": "ingested",
+      "layers": [
+        "acc.motor"
+      ]
+    },
+    {
+      "id": "pm25",
+      "label": "PM2.5 exposure",
+      "reveals": "Atmospheric pollution",
+      "limitation": "Modelled exposure",
+      "status": "blocked",
+      "candidate": "Atmospheric Composition Analysis Group (Washington University), satellite-derived PM2.5 V6.GL; licence to verify",
+      "reason": "The download host is not on the build environment's network allowlist (found in WQL-002), and the licence terms are not yet confirmed.",
+      "needs": "Allow the ACAG host in the cloud environment, or download on Nolen's Mac, and confirm the licence."
+    },
+    {
+      "id": "extreme_heat",
+      "label": "Extreme heat",
+      "reveals": "Thermal exposure",
+      "limitation": "Not individual vulnerability",
+      "status": "blocked",
+      "candidate": "ERA5 / ERA5-Land reanalysis (Copernicus Climate Data Store), CC BY 4.0 (to verify)",
+      "reason": "The Climate Data Store requires a registered account and API key. Which heat measure to publish (for example days above a temperature threshold, or wet-bulb temperature) is a design choice that has not been made.",
+      "needs": "A CDS API key as a build secret, and Nolen's choice of heat measure."
+    },
+    {
+      "id": "child_mortality",
+      "label": "Child mortality",
+      "reveals": "Realized biological welfare",
+      "limitation": "Uneven spatial coverage",
+      "status": "prospective",
+      "candidate": "IHME under-5 mortality estimates for low- and middle-income countries, 5 km (Burstein et al. 2019); IHME's free non-commercial user agreement (to verify)",
+      "reason": "The only gridded source known so far is licensed for non-commercial use only. Under proposed D-13 it is registered, not ingested. Coverage is low- and middle-income countries only, so most of the globe would be absent by design, not unobserved.",
+      "needs": "Nolen's ruling on D-13, or an openly licensed gridded source."
+    },
+    {
+      "id": "electricity_access",
+      "label": "Electricity access",
+      "reveals": "Material infrastructure",
+      "limitation": "Not reliability",
+      "status": "next",
+      "candidate": "Falchetta et al. (2019), gridded electricity access estimates from night lights and population, Scientific Data; licence to verify",
+      "reason": "Not yet ingested. The best-known gridded estimates are derived from night lights and population, so they would not be independent of either layer.",
+      "needs": "Licence check, then a [[layer]] entry."
+    },
+    {
+      "id": "drinking_water",
+      "label": "Drinking water access",
+      "reveals": "Basic resource security",
+      "limitation": "Often coarse resolution",
+      "status": "prospective",
+      "candidate": "IHME WaSH access estimates for low- and middle-income countries, 5 km; IHME non-commercial terms (to verify). WHO/UNICEF JMP publishes national figures only.",
+      "reason": "Only non-commercially licensed gridded estimates are known so far; the openly published JMP figures are national, which would spread one number over a whole country.",
+      "needs": "Nolen's ruling on D-13, or acceptance of national JMP values with spatial fidelity D."
+    },
+    {
+      "id": "education",
+      "label": "Educational attainment",
+      "reveals": "Realized educational opportunity",
+      "limitation": "Not educational quality",
+      "status": "prospective",
+      "candidate": "IHME educational attainment estimates for low- and middle-income countries, 5 km; IHME non-commercial terms (to verify)",
+      "reason": "Only non-commercially licensed gridded estimates are known so far.",
+      "needs": "Nolen's ruling on D-13, or an openly licensed source."
+    },
+    {
+      "id": "vegetation",
+      "label": "Vegetation coverage",
+      "reveals": "Local ecological conditions",
+      "limitation": "Not ecological integrity",
+      "status": "next",
+      "candidate": "ESA WorldCover 2021 (10 m land cover, tree and grass classes), CC BY 4.0",
+      "reason": "Not yet ingested. At 10 m the source is about 2,600 tiles, so it needs a streaming aggregation step rather than a whole-file read.",
+      "needs": "A tiled ingestion rule (share of pixels in a class), then a [[layer]] entry."
+    },
+    {
+      "id": "internet",
+      "label": "Internet accessibility",
+      "reveals": "Digital connectivity",
+      "limitation": "Not digital literacy",
+      "status": "prospective",
+      "candidate": "Ookla Open Data speed tests by tile, CC BY-NC-SA 4.0",
+      "reason": "Licensed for non-commercial use only. Speed tests also record where tests were run, not where people lack access.",
+      "needs": "Nolen's ruling on D-13, or an openly licensed source."
+    },
+    {
+      "id": "census_recency",
+      "label": "Census recency",
+      "reveals": "Observational currency",
+      "limitation": "Not statistical accuracy",
+      "status": "next",
+      "candidate": "UN Statistics Division census dates (already transcribed for six countries in WQL-002) with a global boundary overlay",
+      "reason": "Built for the Lake Victoria window only. Going global needs census dates for every country and a global boundary layer; geoBoundaries' global composite mixes licences, including ODbL share-alike.",
+      "needs": "A transcription of the UNSD dates for all countries and a decision on the boundary source."
+    }
+  ],
+  "sources": {
+    "ghsl_land_2018": {
+      "name": "GHS-LAND R2022A, epoch 2018, 1 km (land surface grid)",
+      "publisher": "European Commission, Joint Research Centre (GHSL)",
+      "url": "https://human-settlement.emergency.copernicus.eu/download.php?ds=land",
+      "download": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_LAND_GLOBE_R2022A/GHS_LAND_E2018_GLOBE_R2022A_54009_1000/V1-0/GHS_LAND_E2018_GLOBE_R2022A_54009_1000_V1_0.zip",
+      "fetch": "file",
+      "licence": "CC BY 4.0",
+      "licence_checked": "2026-11-27, copyright.txt in the download folder",
+      "citation": "Pesaresi, Martino; Politis, Panagiotis (2022): GHS-LAND R2022A - Land fraction as derived from Sentinel-2 image composite (2018) and OSM data. European Commission, Joint Research Centre (JRC). doi:10.2905/AB7AD451-5ED5-44A6-A4D0-9F7A4E848CEE",
+      "native_grain": "1 km raster in World Mollweide (EPSG:54009); each pixel holds square metres of land",
+      "reference_period": [
+        "2018-01-01",
+        "2018-12-31"
+      ],
+      "status": "modelled",
+      "grade": {
+        "recency": "B",
+        "directness": "B",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "D"
+      },
+      "grade_notes": "Land surface estimated jointly from a 2018 Sentinel-2 composite, 2014 Landsat panchromatic data and OpenStreetMap (GHSL Data Package 2022, section 2.5). Pixels with no value (mostly open sea) are read by this build as holding no land. From the same GHSL production family as GHS-POP, so not an independent check on it.",
+      "renewal": {
+        "kind": "listing",
+        "listing": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/",
+        "pattern": "GHS_LAND_GLOBE_R\\d{4}[A-Z]",
+        "current": "GHS_LAND_GLOBE_R2022A",
+        "cadence_months": 36
+      },
+      "grade_weakest": "D",
+      "files": {
+        "ghsl_land/GHS_LAND_E2018_GLOBE_R2022A_54009_1000_V1_0.zip": {
+          "sha256": "13860bd1a6550429b0260db2f2746861208aa34656b7c505b58a2031b8699768",
+          "bytes": 175695862,
+          "retrieved": "unknown (file was present)",
+          "server": {
+            "Last-Modified": "Thu, 23 Jun 2022 21:13:18 GMT",
+            "ETag": "\"a78e7f6-5e223ec375733\"",
+            "Content-Length": "175695862"
+          }
+        }
+      }
+    },
+    "ghsl_pop_2020_global": {
+      "name": "GHS-POP R2023A, epoch 2020, global 30 arc-second mosaic",
+      "publisher": "European Commission, Joint Research Centre (GHSL)",
+      "url": "https://human-settlement.emergency.copernicus.eu/download.php?ds=pop",
+      "download": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_4326_30ss/V1-0/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0.zip",
+      "fetch": "file",
+      "licence": "Reuse authorised provided the source is acknowledged (Commission Decision 2011/833/EU on the reuse of Commission documents); licensed under CC BY 4.0",
+      "licence_url": "https://data.jrc.ec.europa.eu/dataset/2ff68a52-5b5b-4a22-8f40-c41da8332cfe",
+      "licence_checked": "2026-11-26: JRC dataset record (release review) and copyright.txt in the download folder",
+      "citation": "Schiavina M., Freire S., Carioli A., MacManus K. (2023): GHS-POP R2023A - GHS population grid multitemporal (1975-2030). European Commission, Joint Research Centre. doi:10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE",
+      "native_grain": "30 arc-second raster (about 0.93 km at the equator, narrower towards the poles), WGS84; JRC's own resampling of the 100 m / 1 km Mollweide product",
+      "reference_period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "status": "modelled",
+      "grade": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "B",
+        "interval": "D"
+      },
+      "grade_notes": "Modelled from census counts disaggregated onto built-up surface. No per-pixel interval is published. GHSL writes 0 both on unpopulated land and on open water, so a zero here does not say whether the place is land (see the land-surface layer). Recency is not yet lowered per country for old censuses in the global build: that needs the census-recency layer, which is registered but not yet ingested globally.",
+      "renewal": {
+        "kind": "listing",
+        "listing": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/",
+        "pattern": "GHS_POP_GLOBE_R\\d{4}[A-Z]",
+        "current": "GHS_POP_GLOBE_R2023A",
+        "related": "GHS_(?:WUP_)?POP_[A-Z]+_R\\d{4}[A-Z]",
+        "cadence_months": 24
+      },
+      "grade_weakest": "D",
+      "files": {
+        "ghsl_global/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0.zip": {
+          "sha256": "8de311f475322cebb920edd870dda0f50fb1750a2a2c0f533c9ecf2f41589c45",
+          "bytes": 482351880,
+          "retrieved": "unknown (file was present)",
+          "server": {
+            "Last-Modified": "Tue, 24 Sep 2024 12:24:42 GMT",
+            "ETag": "\"1cc01b08-622dc970c539a\"",
+            "Content-Length": "482351880"
+          }
+        }
+      }
+    },
+    "map_travel_2020_global": {
+      "name": "Malaria Atlas Project: travel time to healthcare, 2020, motorised (global surface via WCS)",
+      "publisher": "Malaria Atlas Project; Weiss et al. 2020",
+      "url": "https://malariaatlas.org/open-access-policy/",
+      "download": "https://data.malariaatlas.org/geoserver/Accessibility/ows?service=WCS&version=2.0.1&request=GetCoverage&coverageId=Accessibility__202001_Global_{variant}&subset=Lat({south},{north})&subset=Long({west},{east})&format=image/geotiff",
+      "fetch": "wcs_tiles",
+      "extent": [
+        -60,
+        -180,
+        85,
+        180
+      ],
+      "licence": "CC BY 3.0 Unported",
+      "licence_checked": "2026-11-26, per WQL-001 section 4.6",
+      "citation": "Weiss D.J., Nelson A., Vargas-Ruiz C.A., et al. (2020). Global maps of travel time to healthcare facilities. Nature Medicine 26, 1835-1838. doi:10.1038/s41591-020-1059-1",
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84, 60°S to 85°N",
+      "reference_period": [
+        "2019-01-01",
+        "2020-12-31"
+      ],
+      "status": "modelled",
+      "grade": {
+        "recency": "C",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "B",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade_notes": "A least-cost model over a friction surface and a facility list compiled around 2019. Facility coverage in the source list varies by country and is not quantified here. Travel time to the nearest facility says nothing about the facility's quality, staffing or cost. No value over open water or outside 60°S to 85°N.",
+      "renewal": {
+        "kind": "wcs_capabilities",
+        "capabilities": "https://data.malariaatlas.org/geoserver/Accessibility/ows?service=WCS&version=2.0.1&request=GetCapabilities",
+        "pattern": "Accessibility__\\d{6}_Global_Motorized_Travel_Time_to_Healthcare",
+        "current": "Accessibility__202001_Global_Motorized_Travel_Time_to_Healthcare",
+        "cadence_months": 60
+      },
+      "grade_weakest": "D",
+      "files": {
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_+0000.tif": {
+          "sha256": "b14ddb9b59d471417bddd84a858cff3c20eb7d23797a69905345e2c269a84b21",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:12+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_+0030.tif": {
+          "sha256": "fdd43c31bda86ce7fa6c62b4170d7e77e60ee4a9fd32af6312b17440c99ac031",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:11+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_+0060.tif": {
+          "sha256": "0bbdd4dcb7f363f3282357992725d3fc9e0150951875a9d0d73d193dbe44b557",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:13+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_+0090.tif": {
+          "sha256": "069d9cb5bd44156ab134dba8641903cf16f21394c462b7c43503525ed6a0f113",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:14+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_+0120.tif": {
+          "sha256": "2c088d8e9846cb932f946a11ef08403fe0cb86376207b4be19de3ec5d211b34f",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:22+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_+0150.tif": {
+          "sha256": "38626b457d0e8d44edaaf638a3cfab284310f93c87261e4bdaf2c7bf5f277cb9",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:21+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_-0030.tif": {
+          "sha256": "952b4d7c61c85bba609af4f95f9c8c6a1591be6d426e4ed0635a7bf2b79f5a91",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:03+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_-0060.tif": {
+          "sha256": "b47909c3509b96bccac888570c589dcdd5d41a41cdbbad204967173d8bf91006",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:00+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_-0090.tif": {
+          "sha256": "798ae7a69d43339315caaf26b956cfe3897423c54175b81acf62d76b595f13c6",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:00+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_-0120.tif": {
+          "sha256": "006893b66335498f7f837d4162fca1a4ade5b3bfb8f6e63e677e0f9d0116f490",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:59+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_-0150.tif": {
+          "sha256": "e3d2f88aa3944b99db5e8d97b42e43b962a76283a3faf6f856df3986923c9286",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:53+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+000_-0180.tif": {
+          "sha256": "10d8ece0bf37929d056572020df2afa938acfc64edd23d06a7200aa1694802dc",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:50+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_+0000.tif": {
+          "sha256": "7aefd0022f4642a105c1a499354b1896f4bdfaabe062c1a4015b60d44732c385",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:45+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_+0030.tif": {
+          "sha256": "4f7c668a071e10a047e675a909f4f49797a4e76952db985a69551525346b311b",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:48+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_+0060.tif": {
+          "sha256": "5e9a6cf9b4e93ecb7d63deeaef4886eea4e8ca16f7e90c43ef285a5ad12a9540",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:48+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_+0090.tif": {
+          "sha256": "80e3376e13b67ed6cd7218b507736d79a91b123d4cb93cfb4ff74befd4a97804",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:51+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_+0120.tif": {
+          "sha256": "1a122b65a78fa8b2a2da7e8c90bc354e7f1bf6d248427d98a98a1e746189112f",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:55+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_+0150.tif": {
+          "sha256": "f8e233dec9a3136be7747470f1d03d49d3fcdff660be87f03872b68f76a06ac2",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:56+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_-0030.tif": {
+          "sha256": "7f46b70312b32fdf0b8e342d342275823c235f602c883e4e07124e1e578ad167",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:35+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_-0060.tif": {
+          "sha256": "eddf26ede3e123e861bb9f49888ad3b888552e844897edf15f7d851191df3588",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:36+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_-0090.tif": {
+          "sha256": "943ebd9898dbd9671c80b74a562d5828fafe22194ac9d2fcdb0efb379d720101",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:33+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_-0120.tif": {
+          "sha256": "35fe32f5845aaae74d9c9f2bb3f711e3561e9caa1c131fc0ee3ccb46d71c4a62",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:35+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_-0150.tif": {
+          "sha256": "b44ec652f3f1cbcbd20f137d62ddf0c13a709963148d6a5816e7aac11f97c775",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:25+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+030_-0180.tif": {
+          "sha256": "d27a4873e72ff54d6ec340d249b9bc092e1f0be05918e0f4900545d6ddb934f9",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:02:23+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_+0000.tif": {
+          "sha256": "e7e5b160131c9615b371636ae1262eb61da2f91846e7b163b81e06a8b52af073",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:10+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_+0030.tif": {
+          "sha256": "7fa08faa61e352a728c1decbe3c175f5803bc5c571a531a8d52eaec26948624b",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:11+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_+0060.tif": {
+          "sha256": "80b16d97e9a4e8acf09bbc4d7bf7e4e311b97499ccf57f521792eea160cb294d",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:17+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_+0090.tif": {
+          "sha256": "b0257cc6d716d624203bca4e56d23133f733d58e2673977712b33f04a7ddb821",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:18+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_+0120.tif": {
+          "sha256": "ee72f0de52f02f8b9af597099bf80ee9e1d6ca3ffd83fac2e92005d55c124dec",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:17+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_+0150.tif": {
+          "sha256": "bac6aed3908769cd6bb32dfa8899c549443e9f7ddc7ad572f434fc1ec4b15a32",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:19+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_-0030.tif": {
+          "sha256": "0bce59aec30940c6103cdc7094730fda867887a66f085791cda67d1a4cecfda4",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:08+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_-0060.tif": {
+          "sha256": "07910f00230c2a0aaa669b320aac4d43e6613cefcfb928c376d8de040dd9132b",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:07+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_-0090.tif": {
+          "sha256": "84af54de203f3a1cfdabd971edf16e4acd73161924c3ca4d97591f0f152a07e9",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:02+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_-0120.tif": {
+          "sha256": "28af4511d2622e189cb265371afcf8b1dd2dfc7b557c4565d515f6022e7fbf05",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:02+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_-0150.tif": {
+          "sha256": "8bd7511eca9838aaccd7490fa23b24a2507c5c1d8159399bf3004d0c778dec48",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:03:00+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_+060_-0180.tif": {
+          "sha256": "928eadbb0de8f1bff0ac7b34a84e0141451a2445ecec4882d33696de03abf7b4",
+          "bytes": 50332436,
+          "retrieved": "2026-11-27T17:02:55+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_+0000.tif": {
+          "sha256": "9fa55ff635d92c51c63717c5c58a99562c420f749e19d98aec21b147c0723dc7",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:34+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_+0030.tif": {
+          "sha256": "5196135b22c7e2f4e16ec0b70206f6c2bb80dee82f83dc67f8dbf356b27ec21a",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:34+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_+0060.tif": {
+          "sha256": "8a90ac815d0fcc28e82aa41cfd344a35328ff6764b2424569d93986de922a07e",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:42+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_+0090.tif": {
+          "sha256": "9a6ce4e25957a03cb6c9e3a65ac554027ff07b791849c34b3625a76fb6465906",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:47+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_+0120.tif": {
+          "sha256": "6b62c609f299831ce46828bd261ea1ffe38a360d215a3209b79e6546a30b0b7e",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:47+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_+0150.tif": {
+          "sha256": "fd7ccde2f4186d8128d9c4d2127034a932c0f75a0d5716598bb012ab67933695",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:44+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_-0030.tif": {
+          "sha256": "44599d08379d2ec6c9df3c82da984b19c6778b29ab92fb36358207ecdd500fc5",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:34+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_-0060.tif": {
+          "sha256": "b4fcd1bd2999ee8fa28dc66a09a813e0486e8b10e3b8afe6c590ab2e8a53e275",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:33+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_-0090.tif": {
+          "sha256": "970da1472cd41c010838201d821d5890c269f721a266012662b758ef9b1bfe72",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:24+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_-0120.tif": {
+          "sha256": "85e9297f86fc5294c2bdd54b99c9d84121dfc665778148b7859aea43f3446c34",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:22+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_-0150.tif": {
+          "sha256": "63a43d1d58e1c8296ab85fd9dd8d081185ecd1abc8f12c3e5d62fca7895bebf2",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:21+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-030_-0180.tif": {
+          "sha256": "d08ed83c3753a8399cdbe9ddaab162481af87522323e1bbd76a4f7b8112d78dd",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:21+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_+0000.tif": {
+          "sha256": "d0aa997e8d6522664236ddcf218d50f27ff6d8d329b0f71befd7d3fa658ca237",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:00:59+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_+0030.tif": {
+          "sha256": "e94b7452492b2f80733668f087177e676e2cffea042356b378b57822f67b7f0f",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:00+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_+0060.tif": {
+          "sha256": "1ad76f86206aee7f755eb1d4375ef9b7d86fa4cd9912dd54a8659db7faae26d6",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:10+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_+0090.tif": {
+          "sha256": "0f3742042e046f6ffefe02c4ba37a35c937a9991f90c027d0acb23957322af3d",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:12+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_+0120.tif": {
+          "sha256": "1c9a29613047a3af24b0a9c69f76a045746b3e26ad4cafe768ab454ef7cfe451",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:12+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_+0150.tif": {
+          "sha256": "9a7f6d898047151d4820fbec9e6537d7bc8d9e2261dd5d7ea98ccc41ebb7cb54",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:13+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_-0030.tif": {
+          "sha256": "fff348ebebfc2defeacc53eb68cee4e066a13a4d92c71124bd1651800d932764",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:00:59+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_-0060.tif": {
+          "sha256": "1afb14bcbd267b3756776b4c028b15f5033f4eb934ffa428d2aba5f5be40e16b",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:01:01+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_-0090.tif": {
+          "sha256": "d7ad60eb7685efb47ea0993816f5596d5dac2028e077edc1fae349538c37eecc",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:00:49+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_-0120.tif": {
+          "sha256": "d4a086a3790dff66cf786376b96ebbabd4ec84cde29cf8a65c7dbe02407d92f2",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:00:48+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_-0150.tif": {
+          "sha256": "a1f0ac78f6a4de7ace30ee866bc000863b52c32c671613bb5465cf841f12d9d1",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:00:49+00:00",
+          "server": {}
+        },
+        "map_global/Motorized_Travel_Time_to_Healthcare/Motorized_Travel_Time_to_Healthcare_-060_-0180.tif": {
+          "sha256": "98d31c555c99755666095d5f29d749e48499fe650c2632dab030c4435c00b24d",
+          "bytes": 67109780,
+          "retrieved": "2026-11-27T17:00:48+00:00",
+          "server": {}
+        }
+      }
+    },
+    "worldpop_2020_global": {
+      "name": "WorldPop Global2 R2025A, 2020, constrained, UN-adjusted, 1 km",
+      "publisher": "WorldPop, University of Southampton",
+      "url": "https://hub.worldpop.org/project/categories?id=3",
+      "download": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/0_Mosaicked/v1/1km_ua/constrained/global_pop_2020_CN_1km_R2025A_UA_v1.tif",
+      "fetch": "file",
+      "licence": "CC BY 4.0 (confirmed by WorldPop for Global2 R2025A)",
+      "licence_url": "https://www.worldpop.org/faq/",
+      "licence_checked": "2026-11-26: WorldPop catalogue (https://api.worldpop.org/v3/documentation) and redistribution FAQ, per the release review",
+      "citation": "WorldPop (www.worldpop.org). Global2 R2025A population estimates, 2020, 1 km, constrained, UN-adjusted. University of Southampton. Labelled alpha by the publisher.",
+      "native_grain": "30 arc-second raster (about 0.93 km), WGS84, 60°S to 84°N",
+      "reference_period": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "status": "modelled",
+      "grade": {
+        "recency": "B",
+        "directness": "C",
+        "spatial_fidelity": "A",
+        "coverage": "A",
+        "validation": "C",
+        "interval": "D"
+      },
+      "grade_notes": "Release labelled alpha. Constrained: people are placed only where settlement is mapped, and elsewhere the raster has no value (not zero). Totals adjusted to UN WPP national estimates. Covers 60°S to 84°N only. WorldPop asks that the data not be used to discriminate, exploit or surveil.",
+      "renewal": {
+        "kind": "head"
+      },
+      "grade_weakest": "D",
+      "files": {}
+    }
+  },
+  "reasons": {
+    "wp_nodata": "WorldPop makes no estimate in this cell. Its constrained model places people only where settlement is mapped; elsewhere the raster has no value, which is not a zero.",
+    "wp_extent": "Outside WorldPop's extent (60°S to 84°N).",
+    "d_missing": "One of the two population models has no value here, so they cannot be compared.",
+    "d_small": "Both population models estimate fewer than 100 people here; a percentage difference would mostly be noise.",
+    "map_nodata": "The Malaria Atlas Project surface has no value here: open water, or land outside its modelled surface.",
+    "map_extent": "Outside the Malaria Atlas Project surface's extent (60°S to 85°N).",
+    "ghsl_extent": "Outside the GHSL global mosaic's extent (about 89°S to 89°N)."
+  },
+  "notes": {
+    "ghsl_zero_water": "GHSL models no residents here, and GHS-LAND finds no land: this zero is written on water.",
+    "ghsl_zero_land": "GHSL models no residents on the land in this cell.",
+    "ghsl_partial_water": "Part of this cell is water (see land share), and density is per km² of the whole cell.",
+    "map_unweighted": "GHSL models no residents in this cell, so this is the unweighted mean of the pixels.",
+    "map_on_water": "GHS-LAND finds no land in this cell, but the Malaria Atlas Project still models a travel time across its surface. Unweighted mean of the pixels.",
+    "land_over_100": "Above 100% because whole 1 km pixels are assigned by their centres; read as all land."
+  },
+  "extent": {
+    "worldpop": [
+      -60.0,
+      84.0
+    ],
+    "map": [
+      -60.0,
+      85.0
+    ],
+    "ghsl": [
+      -89.1,
+      89.1
+    ]
+  },
+  "untouched": "No ingested source has any pixel here with land, modelled residents or a value: GHS-LAND finds no land, GHSL models no residents, and WorldPop and the Malaria Atlas Project make no estimate. This is open water as far as these sources can tell, or beyond every source's extent.",
+  "counts": {
+    "inspect": {
+      "res": 5,
+      "cells_touched": 603090,
+      "files": 522
+    },
+    "display": {
+      "4": {
+        "folder": "r4",
+        "shard_res": 0,
+        "cells": 91493,
+        "files": 109
+      },
+      "3": {
+        "file": "r3.json",
+        "cells": 14773
+      },
+      "2": {
+        "file": "r2.json",
+        "cells": 2645
+      }
+    }
+  },
+  "totals": {
+    "ghsl_people": 7840952947,
+    "worldpop_people": 7851251779,
+    "land_km2": 144617379
+  },
+  "dimensions": [
+    "recency",
+    "directness",
+    "spatial_fidelity",
+    "coverage",
+    "validation",
+    "interval"
+  ]
+}

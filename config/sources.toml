@@ -107,3 +107,85 @@ licence_checked = "2026-11-26, geoBoundaries API metadata"
 citation = "Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLoS ONE 15(4): e0231866."
 native_grain = "Vector polygons (simplified)"
 status = "measured"
+
+# ------------------------------------------------------------------ WQL-003 global sources
+# Fetch fields (pipeline/global_fetch.py): folder under data/raw, fetch method,
+# and for WCS sources the extent [south, west, north, east] and tile size.
+# `renewal` says how renew.py checks for a changed or newer upstream release.
+
+[ghsl_pop_2020_global]
+name = "GHS-POP R2023A, epoch 2020, global 30 arc-second mosaic"
+publisher = "European Commission, Joint Research Centre (GHSL)"
+url = "https://human-settlement.emergency.copernicus.eu/download.php?ds=pop"
+download = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_4326_30ss/V1-0/GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0.zip"
+fetch = "file"
+folder = "ghsl_global"
+raster = "GHS_POP_E2020_GLOBE_R2023A_4326_30ss_V1_0.tif"
+licence = "Reuse authorised provided the source is acknowledged (Commission Decision 2011/833/EU on the reuse of Commission documents); licensed under CC BY 4.0"
+licence_url = "https://data.jrc.ec.europa.eu/dataset/2ff68a52-5b5b-4a22-8f40-c41da8332cfe"
+licence_checked = "2026-11-26: JRC dataset record (release review) and copyright.txt in the download folder"
+citation = "Schiavina M., Freire S., Carioli A., MacManus K. (2023): GHS-POP R2023A - GHS population grid multitemporal (1975-2030). European Commission, Joint Research Centre. doi:10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE"
+native_grain = "30 arc-second raster (about 0.93 km at the equator, narrower towards the poles), WGS84; JRC's own resampling of the 100 m / 1 km Mollweide product"
+reference_period = ["2020-01-01", "2020-12-31"]
+status = "modelled"
+grade = { recency = "B", directness = "C", spatial_fidelity = "A", coverage = "A", validation = "B", interval = "D" }
+grade_notes = "Modelled from census counts disaggregated onto built-up surface. No per-pixel interval is published. GHSL writes 0 both on unpopulated land and on open water, so a zero here does not say whether the place is land (see the land-surface layer). Recency is not yet lowered per country for old censuses in the global build: that needs the census-recency layer, which is registered but not yet ingested globally."
+renewal = { kind = "listing", listing = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/", pattern = "GHS_POP_GLOBE_R\\d{4}[A-Z]", current = "GHS_POP_GLOBE_R2023A", related = "GHS_(?:WUP_)?POP_[A-Z]+_R\\d{4}[A-Z]", cadence_months = 24 }
+
+[worldpop_2020_global]
+name = "WorldPop Global2 R2025A, 2020, constrained, UN-adjusted, 1 km"
+publisher = "WorldPop, University of Southampton"
+url = "https://hub.worldpop.org/project/categories?id=3"
+download = "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/0_Mosaicked/v1/1km_ua/constrained/global_pop_2020_CN_1km_R2025A_UA_v1.tif"
+fetch = "file"
+folder = "worldpop"
+raster = "global_pop_2020_CN_1km_R2025A_UA_v1.tif"
+licence = "CC BY 4.0 (confirmed by WorldPop for Global2 R2025A)"
+licence_url = "https://www.worldpop.org/faq/"
+licence_checked = "2026-11-26: WorldPop catalogue (https://api.worldpop.org/v3/documentation) and redistribution FAQ, per the release review"
+citation = "WorldPop (www.worldpop.org). Global2 R2025A population estimates, 2020, 1 km, constrained, UN-adjusted. University of Southampton. Labelled alpha by the publisher."
+native_grain = "30 arc-second raster (about 0.93 km), WGS84, 60°S to 84°N"
+reference_period = ["2020-01-01", "2020-12-31"]
+status = "modelled"
+grade = { recency = "B", directness = "C", spatial_fidelity = "A", coverage = "A", validation = "C", interval = "D" }
+grade_notes = "Release labelled alpha. Constrained: people are placed only where settlement is mapped, and elsewhere the raster has no value (not zero). Totals adjusted to UN WPP national estimates. Covers 60°S to 84°N only. WorldPop asks that the data not be used to discriminate, exploit or surveil."
+renewal = { kind = "head" }
+
+[ghsl_land_2018]
+name = "GHS-LAND R2022A, epoch 2018, 1 km (land surface grid)"
+publisher = "European Commission, Joint Research Centre (GHSL)"
+url = "https://human-settlement.emergency.copernicus.eu/download.php?ds=land"
+download = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_LAND_GLOBE_R2022A/GHS_LAND_E2018_GLOBE_R2022A_54009_1000/V1-0/GHS_LAND_E2018_GLOBE_R2022A_54009_1000_V1_0.zip"
+fetch = "file"
+folder = "ghsl_land"
+raster = "GHS_LAND_E2018_GLOBE_R2022A_54009_1000_V1_0.tif"
+licence = "CC BY 4.0"
+licence_checked = "2026-11-27, copyright.txt in the download folder"
+citation = "Pesaresi, Martino; Politis, Panagiotis (2022): GHS-LAND R2022A - Land fraction as derived from Sentinel-2 image composite (2018) and OSM data. European Commission, Joint Research Centre (JRC). doi:10.2905/AB7AD451-5ED5-44A6-A4D0-9F7A4E848CEE"
+native_grain = "1 km raster in World Mollweide (EPSG:54009); each pixel holds square metres of land"
+reference_period = ["2018-01-01", "2018-12-31"]
+status = "modelled"
+grade = { recency = "B", directness = "B", spatial_fidelity = "A", coverage = "A", validation = "B", interval = "D" }
+grade_notes = "Land surface estimated jointly from a 2018 Sentinel-2 composite, 2014 Landsat panchromatic data and OpenStreetMap (GHSL Data Package 2022, section 2.5). Pixels with no value (mostly open sea) are read by this build as holding no land. From the same GHSL production family as GHS-POP, so not an independent check on it."
+renewal = { kind = "listing", listing = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/", pattern = "GHS_LAND_GLOBE_R\\d{4}[A-Z]", current = "GHS_LAND_GLOBE_R2022A", cadence_months = 36 }
+
+[map_travel_2020_global]
+name = "Malaria Atlas Project: travel time to healthcare, 2020, motorised (global surface via WCS)"
+publisher = "Malaria Atlas Project; Weiss et al. 2020"
+url = "https://malariaatlas.org/open-access-policy/"
+download = "https://data.malariaatlas.org/geoserver/Accessibility/ows?service=WCS&version=2.0.1&request=GetCoverage&coverageId=Accessibility__202001_Global_{variant}&subset=Lat({south},{north})&subset=Long({west},{east})&format=image/geotiff"
+fetch = "wcs_tiles"
+folder = "map_global"
+variants = ["Motorized_Travel_Time_to_Healthcare"]
+extent = [-60, -180, 85, 180]
+tile_deg = 30
+parallel = 4
+licence = "CC BY 3.0 Unported"
+licence_checked = "2026-11-26, per WQL-001 section 4.6"
+citation = "Weiss D.J., Nelson A., Vargas-Ruiz C.A., et al. (2020). Global maps of travel time to healthcare facilities. Nature Medicine 26, 1835-1838. doi:10.1038/s41591-020-1059-1"
+native_grain = "30 arc-second raster (about 0.93 km), WGS84, 60°S to 85°N"
+reference_period = ["2019-01-01", "2020-12-31"]
+status = "modelled"
+grade = { recency = "C", directness = "C", spatial_fidelity = "A", coverage = "B", validation = "C", interval = "D" }
+grade_notes = "A least-cost model over a friction surface and a facility list compiled around 2019. Facility coverage in the source list varies by country and is not quantified here. Travel time to the nearest facility says nothing about the facility's quality, staffing or cost. No value over open water or outside 60°S to 85°N."
+renewal = { kind = "wcs_capabilities", capabilities = "https://data.malariaatlas.org/geoserver/Accessibility/ows?service=WCS&version=2.0.1&request=GetCapabilities", pattern = "Accessibility__\\d{6}_Global_Motorized_Travel_Time_to_Healthcare", current = "Accessibility__202001_Global_Motorized_Travel_Time_to_Healthcare", cadence_months = 60 }

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global reference preview</title>
+<meta name="description" content="Worldwide Quality of Life Map, global reference preview: select any place on Earth and see what is known about it, from which source, how confidently, and what is not known.">
+<link rel="stylesheet" href="../vendor/leaflet.css">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="global.css">
+</head>
+<body>
+<header class="bar">
+  <div class="title">
+    <strong>Global reference preview</strong>
+    <span class="sub">Worldwide Quality of Life Map · WQL-003 · not published</span>
+    <p class="tagline">Select any place on Earth. The map returns what it presently knows there, where each value comes from and how far it can be trusted, and an account of what it does not know. One indicator at a time; nothing is scored or ranked.</p>
+  </div>
+  <nav>
+    <a href="#" id="aboutlink">About this preview</a>
+    <a href="../index.html">Lake Victoria regional preview</a>
+    <a href="https://github.com/nomenolly/worldwide-quality-of-life">Source code</a>
+  </nav>
+</header>
+<main>
+  <section id="mapwrap">
+    <div id="controls" class="four">
+      <div class="ctl">
+        <label for="locality">Locality <span class="hint">where am I looking?</span></label>
+        <form id="locform" autocomplete="off">
+          <input id="locality" type="text" inputmode="decimal" placeholder="latitude, longitude  or  H3 cell" aria-describedby="lochelp">
+          <button type="submit">Go</button>
+        </form>
+        <span id="lochelp" class="hint">or click the map</span>
+      </div>
+      <div class="ctl">
+        <label for="layer">Indicator <span class="hint">what am I looking at?</span></label>
+        <select id="layer"></select>
+      </div>
+      <div class="ctl">
+        <label for="epoch">Observation date <span class="hint">when does this apply?</span></label>
+        <select id="epoch"></select>
+        <span id="epochnote" class="hint"></span>
+      </div>
+      <div class="ctl">
+        <label for="evidence">Evidence <span class="hint">how far can it be read?</span></label>
+        <select id="evidence">
+          <option value="value">Show values</option>
+          <option value="basis">Show what is known here and what is not</option>
+        </select>
+      </div>
+      <div id="legend" aria-live="polite"></div>
+    </div>
+    <div id="map" role="application" aria-label="World map of H3 cells. Click anywhere to inspect what is known there."></div>
+    <div id="zoomnote" class="hint"></div>
+  </section>
+  <aside id="inspector" aria-live="polite">
+    <div id="intro"></div>
+    <div id="cell" hidden></div>
+  </aside>
+</main>
+<script src="../vendor/leaflet.js"></script>
+<script src="../vendor/h3-js.umd.js"></script>
+<script src="global.js"></script>
+</body>
+</html>

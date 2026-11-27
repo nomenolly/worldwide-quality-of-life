@@ -11,7 +11,7 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA_PREFIXES = ("site/data/", "data/processed/", "data/manifest.json")
+DATA_PREFIXES = ("site/data/", "site/global/data/", "data/processed/", "data/manifest.json", "data/builds.json")
 # Strings that only appear in published conflict records (not in code or prose).
 MARKERS = [b'"sec.conflict":{', b',sec.conflict,', b'"events_within_25km"', b'"deaths_placed_best"',
            b'"unlocated"', b'"deaths_best"']
@@ -38,7 +38,8 @@ def main() -> int:
             for m in MARKERS:
                 if m in blob:
                     hits.append(f"{c.decode()[:10]} {p}: {m.decode()}")
-    for f in list((ROOT / "site" / "data").rglob("*")) + list((ROOT / "data" / "processed").rglob("*")):
+    for f in (list((ROOT / "site" / "data").rglob("*")) + list((ROOT / "site" / "global" / "data").rglob("*"))
+              + list((ROOT / "data" / "processed").rglob("*"))):
         if f.is_file():
             b = f.read_bytes()
             for m in MARKERS:

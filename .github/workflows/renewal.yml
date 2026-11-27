@@ -1,0 +1,27 @@
+# WQL-003 step 5: monthly check of every global source for upstream changes.
+# Reads only server headers and publisher listings; downloads nothing, publishes
+# nothing. A red run means a source changed or a newer release is listed: read
+# the uploaded report, then decide whether to renew (edit config/sources.toml,
+# run `make global`, review, commit).
+name: Source renewal check
+on:
+  schedule:
+    - cron: "17 6 3 * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - run: cd pipeline && python renew.py --strict
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: renewal-report
+          path: data/renewal.json
